@@ -355,7 +355,7 @@ export function NotebookCheckForm({
 
       clearAllTopicDrafts();
       toast.success(result.message);
-      router.push(`/checks/${result.data?.checkId}`);
+      router.push(`/classes/${result.data?.classId}/topics/${result.data?.topicId}`);
       router.refresh();
     });
   });

@@ -69,7 +69,7 @@ export default async function DashboardPage() {
                 <Link
                   key={check.id}
                   className="flex items-center justify-between rounded border border-border/60 bg-card px-4 py-2.5 transition hover:bg-neutral-50/50 hover:border-neutral-300"
-                  href={`/checks/${check.id}`}
+                  href={`/classes/${check.classId}/topics/${check.topicId}`}
                 >
                   <div className="flex items-center gap-2 truncate">
                     <span className="text-sm select-none">📓</span>

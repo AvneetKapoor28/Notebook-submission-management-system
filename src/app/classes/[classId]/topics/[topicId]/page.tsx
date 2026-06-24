@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Calendar, CheckCircle2, ClipboardList, AlertCircle } from "lucide-react";
 
 import {
   CompletionStatusBadge,
@@ -22,6 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { MetricCard } from "@/components/app/metric-card";
 import { getTopicByClass } from "@/features/topics/queries";
 import { formatPercent, formatShortDate } from "@/lib/format";
 
@@ -38,16 +41,41 @@ export default async function TopicDetailPage({
   }
 
   const lastCheck = topic.notebookCheck;
-  const lastCompletionRate = lastCheck
+  const stats = lastCheck
     ? (() => {
-        const eligible = lastCheck.studentRecords.filter(
+        const total = lastCheck.studentRecords.length;
+        const submitted = lastCheck.studentRecords.filter(
+          (record) =>
+            record.submissionStatus === "SUBMITTED" ||
+            record.submissionStatus === "LATE_SUBMISSION",
+        ).length;
+        const submissionRate = total ? (submitted / total) * 100 : 0;
+
+        const completionEligible = lastCheck.studentRecords.filter(
           (record) => record.completionStatus !== null,
         );
-        const completed = eligible.filter(
+        const completed = completionEligible.filter(
           (record) => record.completionStatus === "COMPLETE",
         ).length;
+        const completionRate = completionEligible.length
+          ? (completed / completionEligible.length) * 100
+          : 0;
 
-        return eligible.length ? (completed / eligible.length) * 100 : null;
+        const issuesCount = lastCheck.studentRecords.filter(
+          (record) =>
+            record.submissionStatus === "NOT_SUBMITTED" ||
+            record.submissionStatus === "LATE_SUBMISSION" ||
+            record.completionStatus === "NOT_DONE" ||
+            record.completionStatus === "INCOMPLETE" ||
+            record.completionStatus === "NEEDS_CORRECTION",
+        ).length;
+
+        return {
+          submissionRate,
+          completionRate,
+          issuesCount,
+          checkDate: lastCheck.checkDate,
+        };
       })()
     : null;
 
@@ -58,128 +86,138 @@ export default async function TopicDetailPage({
           { label: "Classes", href: "/classes" },
           { label: topic.class.name, href: `/classes/${classId}` },
           { label: "Topics" },
-          { label: topic.title }
+          { label: topic.title },
         ]}
         emoji="📓"
         title={topic.title}
-        description={`Chapter ${topic.chapter}. Last checked ${formatShortDate(lastCheck?.checkDate ?? null)} with completion rate ${formatPercent(lastCompletionRate)}.`}
+        description={`Chapter ${topic.chapter} • Taught on ${formatShortDate(topic.dateTaught)}`}
         actions={
-          <Button asChild size="sm" variant={lastCheck ? "outline" : "default"}>
+          <Button asChild size="sm">
             <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
-              {lastCheck ? "Edit notebook check" : "Start notebook check"}
+              {lastCheck ? "Edit check" : "Start check"}
             </Link>
           </Button>
         }
       />
 
-      <Card className="shadow-none border-border/80 bg-card">
-        <CardContent className="p-5">
-          {lastCheck ? (
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-xl select-none leading-none">📅</span>
-                <div>
-                  <p className="font-semibold text-sm text-foreground leading-tight">
-                    Notebook check completed
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-none">
-                    Checked on {formatShortDate(lastCheck.checkDate)} • {lastCheck.studentRecords.length} records
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                {lastCompletionRate !== null && (
-                  <span className="text-xs font-semibold text-emerald-800 bg-green-50 border border-green-200/50 px-1.5 py-0.5 rounded mr-1">
-                    {formatPercent(lastCompletionRate)} complete
-                  </span>
-                )}
-                <Button asChild size="xs" variant="outline">
-                  <Link href={`/checks/${lastCheck.id}`}>Open details</Link>
-                </Button>
-                <Button asChild size="xs">
-                  <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
-                    Edit check
-                  </Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <span className="text-2xl mb-1.5 select-none">📓</span>
-              <p className="text-sm font-semibold text-foreground">No checks completed</p>
-              <p className="text-xs text-muted-foreground mt-0.5 max-w-sm">
-                Assess submissions and completion to calculate stats for this topic.
-              </p>
-              <Button asChild size="sm" className="mt-3">
-                <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
-                  Start check
-                </Link>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {stats ? (
+        <>
+          <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MetricCard
+              label="Completion rate"
+              value={formatPercent(stats.completionRate)}
+              icon={<CheckCircle2 className="size-4" />}
+            />
+            <MetricCard
+              label="Submission rate"
+              value={formatPercent(stats.submissionRate)}
+              icon={<ClipboardList className="size-4" />}
+            />
+            <MetricCard
+              label="Checked date"
+              value={formatShortDate(stats.checkDate)}
+              icon={<Calendar className="size-4" />}
+            />
+            <MetricCard
+              label="Issues found"
+              value={stats.issuesCount === 1 ? "1 student" : `${stats.issuesCount} students`}
+              icon={<AlertCircle className="size-4" />}
+            />
+          </section>
 
-      {lastCheck ? (
-        <Card className="shadow-none border-border/60 bg-card rounded-2xl overflow-hidden">
-          <CardHeader className="p-5 border-b border-border/40">
-            <CardTitle className="text-base font-semibold">Latest check snapshot</CardTitle>
-            <CardDescription className="text-xs text-muted-foreground/80">
-              Recent outcomes for quick topic-level follow-up.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Submission</TableHead>
-                    <TableHead>Completion</TableHead>
-                    <TableHead>Remarks</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lastCheck.studentRecords
-                    .sort(
-                      (left, right) =>
-                        left.student.rollNumber - right.student.rollNumber,
-                    )
-                    .map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-mono font-medium text-muted-foreground/60 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-md min-w-[24px] text-center">
-                              {record.student.rollNumber}
-                            </span>
-                            <span className="font-medium text-foreground text-sm">
-                              {record.student.name}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <SubmissionStatusBadge status={record.submissionStatus} />
-                        </TableCell>
-                        <TableCell>
-                          {record.completionStatus ? (
-                            <CompletionStatusBadge status={record.completionStatus} />
-                          ) : (
-                            <span className="text-[11px] font-semibold text-muted-foreground/50 bg-neutral-50 dark:bg-neutral-800/40 border border-border/30 px-1.5 py-0.5 rounded">N/A</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground/80">
-                          {[...record.remarkTags, record.remarks]
-                            .filter(Boolean)
-                            .join(", ") || "—"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
+          <Card className="shadow-none border-border/60 bg-card rounded-2xl overflow-hidden">
+            <CardHeader className="p-5 border-b border-border/40">
+              <CardTitle className="text-base font-semibold">Check roster & outcomes</CardTitle>
+              <CardDescription className="text-xs text-muted-foreground/80">
+                Review student status, submission details, and remarks for this topic's check.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Student</TableHead>
+                      <TableHead>Submission</TableHead>
+                      <TableHead>Completion</TableHead>
+                      <TableHead>Remarks & Tags</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {(lastCheck?.studentRecords ?? [])
+                      .sort(
+                        (left, right) =>
+                          left.student.rollNumber - right.student.rollNumber,
+                      )
+                      .map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[11px] font-mono font-medium text-muted-foreground/60 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-md min-w-[24px] text-center">
+                                {record.student.rollNumber}
+                              </span>
+                              <span className="font-medium text-foreground text-sm">
+                                {record.student.name}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <SubmissionStatusBadge status={record.submissionStatus} />
+                          </TableCell>
+                          <TableCell>
+                            {record.completionStatus ? (
+                              <CompletionStatusBadge status={record.completionStatus} />
+                            ) : (
+                              <span className="text-[11px] font-semibold text-muted-foreground/50 bg-neutral-50 dark:bg-neutral-800/40 border border-border/30 px-1.5 py-0.5 rounded">
+                                N/A
+                              </span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {record.remarkTags.map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="neutral"
+                                  className="text-[10px] px-1.5 py-0 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-normal border-none"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {record.remarks && (
+                                <span className="text-xs text-muted-foreground font-sans">
+                                  {record.remarks}
+                                </span>
+                              )}
+                              {!record.remarkTags.length && !record.remarks && (
+                                <span className="text-xs text-muted-foreground/45">—</span>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      ) : (
+        <Card className="border-dashed border-border/80 bg-neutral-50/20 shadow-none py-12">
+          <div className="flex flex-col items-center justify-center text-center px-4">
+            <span className="text-3xl mb-3 select-none">📓</span>
+            <h3 className="text-base font-semibold text-foreground">No check completed</h3>
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+              Assess submissions and completion to calculate stats for this topic.
+            </p>
+            <Button asChild size="sm" className="mt-4">
+              <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
+                Start notebook check
+              </Link>
+            </Button>
+          </div>
         </Card>
-      ) : null}
+      )}
     </div>
   );
 }
