@@ -30,7 +30,7 @@ export function AnalyticsCharts({
 }) {
   return (
     <div className="grid gap-6 xl:grid-cols-2">
-      <Card className="bg-white/90">
+      <Card className="bg-white/90 dark:bg-card/75">
         <CardHeader>
           <CardTitle>Class performance</CardTitle>
         </CardHeader>
@@ -47,7 +47,7 @@ export function AnalyticsCharts({
           </ResponsiveContainer>
         </CardContent>
       </Card>
-      <Card className="bg-white/90">
+      <Card className="bg-white/90 dark:bg-card/75">
         <CardHeader>
           <CardTitle>Most problematic topics</CardTitle>
         </CardHeader>

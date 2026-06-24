@@ -101,7 +101,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
               onClick={() => setShowTopicForm((prev) => !prev)}
               variant={showTopicForm ? "secondary" : "default"}
               size="sm"
-              className="gap-1.5 shadow-none border border-border/60 hover:bg-neutral-50/15 cursor-pointer"
+              className="gap-1.5 shadow-none border border-border/60 cursor-pointer"
             >
               <Plus
                 className={cn(
@@ -126,10 +126,10 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
           )}
 
           {/* Scrollable Topics Table Container */}
-          <div className="border border-border/70 rounded-3xl bg-white/90 overflow-hidden shadow-none">
+          <div className="border border-border/70 rounded-3xl bg-white/90 dark:bg-card/75 overflow-hidden shadow-none">
             <div className="max-h-[480px] overflow-y-auto relative scrollbar-thin">
               <Table className="relative border-collapse">
-                <TableHeader className="sticky top-0 bg-white/95 backdrop-blur-xs z-10 border-b border-border/80 shadow-[0_1px_0_0_rgba(0,0,0,0.03)]">
+                <TableHeader className="sticky top-0 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xs z-10 border-b border-border/80 shadow-[0_1px_0_0_rgba(0,0,0,0.03)]">
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="py-2.5 text-xs font-semibold">Topic</TableHead>
                     <TableHead className="py-2.5 text-xs font-semibold">Chapter</TableHead>
@@ -149,7 +149,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                     </TableRow>
                   ) : (
                     classItem.topics.map((topic) => (
-                      <TableRow key={topic.id} className="hover:bg-neutral-50/30">
+                      <TableRow key={topic.id} className="hover:bg-neutral-50/30 dark:hover:bg-neutral-800/20">
                         <TableCell className="font-semibold text-xs md:text-sm py-3.5">
                           {topic.title}
                         </TableCell>
@@ -165,13 +165,13 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                         <TableCell className="py-3.5">
                           {topic.completionRate !== null ? (
                             <div className="flex items-center gap-2">
-                              <div className="h-1.5 w-16 bg-neutral-100 rounded-full overflow-hidden border border-neutral-200/40 shrink-0">
+                              <div className="h-1.5 w-16 bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden border border-neutral-200/40 dark:border-neutral-700/50 shrink-0">
                                 <div
                                   className="h-full bg-emerald-500 rounded-full"
                                   style={{ width: `${topic.completionRate}%` }}
                                 />
                               </div>
-                              <span className="text-xs font-bold text-emerald-800 bg-green-50 border border-green-200/50 px-1 py-0.2 rounded shrink-0">
+                              <span className="text-xs font-bold text-emerald-800 bg-green-50 border border-green-200/50 dark:text-emerald-300 dark:bg-emerald-950/30 dark:border-emerald-900/40 px-1 py-0.2 rounded shrink-0">
                                 {formatPercent(topic.completionRate)}
                               </span>
                             </div>
@@ -223,7 +223,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
               onClick={() => setShowStudentForm((prev) => !prev)}
               variant={showStudentForm ? "secondary" : "default"}
               size="sm"
-              className="gap-1.5 shadow-none border border-border/60 hover:bg-neutral-50/15 cursor-pointer"
+              className="gap-1.5 shadow-none border border-border/60 cursor-pointer"
             >
               <Plus
                 className={cn(

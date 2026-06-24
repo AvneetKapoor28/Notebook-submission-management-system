@@ -15,6 +15,7 @@ import {
 
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { ThemeToggle } from "./theme-toggle";
 
 type ClassItem = {
   id: string;
@@ -160,9 +161,12 @@ export function AppShell({
         </div>
 
         {/* Sidebar Footer */}
-        <div className="mt-auto border-t border-sidebar-border pt-4 px-3 text-[10px] text-muted-foreground flex items-center gap-1.5">
-          <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Active Session</span>
+        <div className="mt-auto border-t border-sidebar-border pt-4 px-3 flex flex-col gap-3">
+          <ThemeToggle />
+          <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
+            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Active Session</span>
+          </div>
         </div>
       </aside>
 
