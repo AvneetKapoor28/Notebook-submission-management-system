@@ -68,5 +68,7 @@ export function StudentsTable({
   data: StudentRow[];
   maxHeightClass?: string;
 }) {
-  return <DataTable columns={columns} data={data} maxHeightClass={maxHeightClass} />;
+  return (
+    <DataTable columns={columns} data={data} maxHeightClass={maxHeightClass} />
+  );
 }

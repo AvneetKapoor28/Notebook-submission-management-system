@@ -2,11 +2,11 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { Search, X } from "lucide-react";
 import {
   Fragment,
   useEffect,
   useMemo,
-  useRef,
   useState,
   useTransition,
   useCallback,
@@ -32,11 +32,9 @@ import {
 import {
   COMPLETION_STATUSES,
   COMPLETION_STATUS_LABELS,
-  COMPLETION_STATUS_SHORTCUTS,
   REMARK_TAGS,
   SUBMISSION_STATUSES,
   SUBMISSION_STATUS_LABELS,
-  SUBMISSION_STATUS_SHORTCUTS,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -82,9 +80,8 @@ export function NotebookCheckForm({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [activeRow, setActiveRow] = useState(0);
   const [expandedRows, setExpandedRows] = useState<number[]>([]);
-  const rowRefs = useRef<Array<HTMLTableRowElement | null>>([]);
+  const [searchQuery, setSearchQuery] = useState("");
   const defaultValues = useMemo<NotebookCheckFormValues>(
     () => {
       if (existingCheck) {
@@ -261,11 +258,6 @@ export function NotebookCheckForm({
     toast.success("Draft discarded.");
   }
 
-  useEffect(() => {
-    const row = rowRefs.current[activeRow];
-    row?.scrollIntoView({ block: "nearest" });
-  }, [activeRow]);
-
   const dirtyRows = useMemo(() => {
     const dirtyFieldRows = formState.dirtyFields.records;
 
@@ -276,66 +268,21 @@ export function NotebookCheckForm({
     return dirtyFieldRows.filter(Boolean).length;
   }, [formState.dirtyFields.records]);
 
-  function handleKeyboardShortcuts(event: React.KeyboardEvent<HTMLDivElement>) {
-    const target = event.target as HTMLElement;
-
-    if (
-      target instanceof HTMLTextAreaElement ||
-      target instanceof HTMLSelectElement ||
-      (target instanceof HTMLInputElement && target.type !== "radio")
-    ) {
-      return;
-    }
-
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      setActiveRow((current) => Math.min(current + 1, students.length - 1));
-      return;
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      setActiveRow((current) => Math.max(current - 1, 0));
-      return;
-    }
-
-    if (event.key === "Enter") {
-      event.preventDefault();
-      toggleExpandedRow(activeRow);
-      return;
-    }
-
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
-      event.preventDefault();
-      void onSubmit();
-      return;
-    }
-
-    const submissionEntry = Object.entries(SUBMISSION_STATUS_SHORTCUTS).find(
-      ([, shortcut]) => shortcut === event.key,
-    );
-
-    if (submissionEntry) {
-      event.preventDefault();
-      setSubmissionStatus(
-        activeRow,
-        submissionEntry[0] as (typeof SUBMISSION_STATUSES)[number],
-      );
-      return;
-    }
-
-    const completionEntry = Object.entries(COMPLETION_STATUS_SHORTCUTS).find(
-      ([, shortcut]) => shortcut === event.key.toUpperCase(),
-    );
-
-    if (completionEntry) {
-      event.preventDefault();
-      setCompletionStatus(
-        activeRow,
-        completionEntry[0] as (typeof COMPLETION_STATUSES)[number],
-      );
-    }
-  }
+  const filteredFieldsWithIndex = useMemo(() => {
+    return fields
+      .map((field, index) => {
+        const student = students.find((s) => s.id === field.studentId) || students[index];
+        return { field, index, student };
+      })
+      .filter(({ student }) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          student.name.toLowerCase().includes(query) ||
+          student.rollNumber.toString().includes(query)
+        );
+      });
+  }, [fields, students, searchQuery]);
 
   const onSubmit = handleSubmit((values) => {
     startTransition(async () => {
@@ -360,7 +307,7 @@ export function NotebookCheckForm({
   });
 
   return (
-    <div className="space-y-4" onKeyDown={handleKeyboardShortcuts}>
+    <div className="space-y-4">
       {draftCandidate ? (
         <div className="rounded-2xl border border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-900/50 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -383,26 +330,38 @@ export function NotebookCheckForm({
       ) : null}
 
       {/* Control / Filter Bar */}
-      <div className="flex flex-col gap-4 rounded-xl border border-border bg-neutral-50/30 dark:bg-neutral-900/10 p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-neutral-50/30 dark:bg-neutral-900/10 p-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
           <div className="space-y-1">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider" htmlFor="check-date">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block" htmlFor="check-date">
               Check date
             </label>
             <Input id="check-date" type="date" className="h-8 text-xs w-[140px] px-2 py-1 shadow-none" {...form.register("checkDate")} />
           </div>
           
-          {/* Keyboard Shortcuts Legend (Only visible on screens with enough width) */}
-          <div className="hidden lg:flex flex-col justify-center h-10 pl-4 border-l border-border/60">
-            <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <span>⌨️</span> Keyboard Shortcuts
-            </span>
-            <div className="flex items-center gap-x-3 text-[11px] text-muted-foreground">
-              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">↑/↓</kbd> Navigate</div>
-              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">1-5</kbd> Submission</div>
-              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">Q-R</kbd> Completion</div>
-              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">Enter</kbd> Notes</div>
-              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">⌘+S</kbd> Submit</div>
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block" htmlFor="search-student">
+              Find Student
+            </label>
+            <div className="relative w-full sm:w-[220px]">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+              <Input
+                id="search-student"
+                type="text"
+                placeholder="Name or roll number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 pr-8 h-8 text-xs shadow-none w-full"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -438,40 +397,35 @@ export function NotebookCheckForm({
               </tr>
             </thead>
             <tbody>
-              {fields.map((field, index) => {
-                const row = watchedRecords[index];
-                const isActive = activeRow === index;
-                const isExpanded = expandedRows.includes(index);
-                const isAbsent = row?.submissionStatus === "ABSENT";
+              {filteredFieldsWithIndex.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="py-8 text-center text-sm text-muted-foreground">
+                    No students found matching &ldquo;{searchQuery}&rdquo;.
+                  </td>
+                </tr>
+              ) : (
+                filteredFieldsWithIndex.map(({ field, index, student }) => {
+                  const row = watchedRecords[index];
+                  const isExpanded = expandedRows.includes(index);
+                  const isAbsent = row?.submissionStatus === "ABSENT";
 
-                return (
-                  <Fragment key={field.id}>
-                    <tr
-                      ref={(element) => {
-                        rowRefs.current[index] = element;
-                      }}
-                      className={cn(
-                        "border-t border-border/40 align-middle transition-colors hover:bg-neutral-50/30 dark:hover:bg-neutral-900/20",
-                        isActive && "bg-amber-500/[0.02] dark:bg-amber-500/[0.01]",
-                      )}
-                      onClick={() => setActiveRow(index)}
-                      tabIndex={0}
-                    >
-                      <td className="px-4 py-3 relative">
-                        {isActive && (
-                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 rounded-r" />
-                        )}
-                        <div className="flex items-center gap-3">
-                          <Badge variant={isActive ? "yellow" : "neutral"} className="shrink-0 w-8 h-5 justify-center font-mono text-[10px] shadow-none">
-                            {students[index].rollNumber}
-                          </Badge>
-                          <div className="truncate">
-                            <p className="font-semibold text-sm text-foreground leading-tight">
-                              {students[index].name}
-                            </p>
+                  return (
+                    <Fragment key={field.id}>
+                      <tr
+                        className="border-t border-border/40 align-middle transition-colors hover:bg-neutral-50/30 dark:hover:bg-neutral-900/20"
+                      >
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="neutral" className="shrink-0 w-8 h-5 justify-center font-mono text-[10px] shadow-none">
+                              {student.rollNumber}
+                            </Badge>
+                            <div className="truncate">
+                              <p className="font-semibold text-sm text-foreground leading-tight">
+                                {student.name}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      </td>
+                        </td>
                       
                       <td className="px-4 py-3 align-middle">
                         <div className="inline-flex w-full max-w-[340px] items-center rounded-lg bg-neutral-100/60 p-0.5 border border-neutral-200/40 dark:bg-neutral-900/60 dark:border-neutral-800/40">
@@ -643,7 +597,8 @@ export function NotebookCheckForm({
                     ) : null}
                   </Fragment>
                 );
-              })}
+              })
+            )}
             </tbody>
           </table>
         </div>
@@ -653,7 +608,11 @@ export function NotebookCheckForm({
       <div className="sticky bottom-4 z-10 rounded-xl border border-border bg-card/95 dark:bg-card/90 backdrop-blur-xs p-4 shadow-md animate-in fade-in duration-300">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-            <Badge variant="neutral" className="px-2 py-0.5 font-semibold">{students.length} students</Badge>
+            <Badge variant="neutral" className="px-2 py-0.5 font-semibold">
+              {searchQuery.trim()
+                ? `Showing ${filteredFieldsWithIndex.length} of ${students.length} students`
+                : `${students.length} students`}
+            </Badge>
             <Badge variant="neutral" className="px-2 py-0.5 font-semibold">{dirtyRows} changed</Badge>
             <span className="flex items-center gap-1 select-none font-medium">
               ☁️{" "}
