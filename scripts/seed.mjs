@@ -317,60 +317,7 @@ async function seed() {
           `;
         }
 
-        if (topicIndex % 2 === 1) {
-          const correctionCheckId = randomUUID();
-          const correctionCheckDate = addDays(regularCheckDate, 4);
 
-          await tx`
-            insert into notebook_checks (
-              id,
-              topic_id,
-              check_date
-            )
-            values (
-              ${correctionCheckId},
-              ${topicId},
-              ${correctionCheckDate}
-            )
-          `;
-
-          for (const [studentIndex, student] of students.entries()) {
-            const submissionStatus = getSubmissionStatus(
-              classIndex,
-              topicIndex,
-              studentIndex,
-              true,
-            );
-            const completionStatus = getCompletionStatus(
-              submissionStatus,
-              classIndex,
-              topicIndex,
-              studentIndex,
-              true,
-            );
-
-            await tx`
-              insert into student_check_records (
-                id,
-                notebook_check_id,
-                student_id,
-                submission_status,
-                completion_status,
-                remark_tags,
-                remarks
-              )
-              values (
-                ${randomUUID()},
-                ${correctionCheckId},
-                ${student.id},
-                ${submissionStatus},
-                ${completionStatus},
-                ${JSON.stringify(getRemarkTags(submissionStatus, completionStatus))},
-                ${completionStatus === "COMPLETE" ? "Corrected and resubmitted" : null}
-              )
-            `;
-          }
-        }
       }
     }
   });

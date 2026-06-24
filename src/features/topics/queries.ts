@@ -11,8 +11,7 @@ export async function getTopicDetail(topicId: string) {
     where: eq(schema.topics.id, topicId),
     with: {
       class: true,
-      notebookChecks: {
-        orderBy: (table, { desc }) => [desc(table.checkDate)],
+      notebookCheck: {
         with: {
           studentRecords: true,
         },
@@ -33,8 +32,7 @@ export async function getTopicByClass(classId: string, topicId: string) {
     where: and(eq(schema.topics.id, topicId), eq(schema.topics.classId, classId)),
     with: {
       class: true,
-      notebookChecks: {
-        orderBy: (table, { desc }) => [desc(table.checkDate)],
+      notebookCheck: {
         with: {
           studentRecords: {
             with: {

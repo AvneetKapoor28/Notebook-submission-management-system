@@ -15,6 +15,13 @@
       "when": 1782315016316,
       "tag": "0001_orange_pretty_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782322421473,
+      "tag": "0002_young_the_watchers",
+      "breakpoints": true
     }
   ]
 }

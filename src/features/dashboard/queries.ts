@@ -15,7 +15,7 @@ export async function getDashboardData() {
       students: true,
       topics: {
         with: {
-          notebookChecks: {
+          notebookCheck: {
             with: {
               studentRecords: true,
             },
@@ -27,15 +27,19 @@ export async function getDashboardData() {
 
   const allStudents = classes.flatMap((classItem) => classItem.students);
   const allChecks = classes.flatMap((classItem) =>
-    classItem.topics.flatMap((topic) =>
-      topic.notebookChecks.map((check) => ({
-        ...check,
-        topicTitle: topic.title,
-        classId: classItem.id,
-        className: classItem.name,
-        studentRecords: check.studentRecords,
-      })),
-    ),
+    classItem.topics
+      .map((topic) =>
+        topic.notebookCheck
+          ? {
+              ...topic.notebookCheck,
+              topicTitle: topic.title,
+              classId: classItem.id,
+              className: classItem.name,
+              studentRecords: topic.notebookCheck.studentRecords,
+            }
+          : null,
+      )
+      .filter((check): check is NonNullable<typeof check> => check !== null),
   );
 
   const recentChecks = allChecks
@@ -43,20 +47,9 @@ export async function getDashboardData() {
     .slice(0, 5);
 
   const pendingCorrections = allChecks.filter((check) => {
-    const hasNeedsCorrection = check.studentRecords.some(
+    return check.studentRecords.some(
       (record) => record.completionStatus === "NEEDS_CORRECTION",
     );
-    if (!hasNeedsCorrection) return false;
-
-    const topicChecks = allChecks.filter((c) => c.topicId === check.topicId);
-    const isLatest = topicChecks.every((c) => {
-      if (c.id === check.id) return true;
-      if (c.checkDate > check.checkDate) return false;
-      if (c.checkDate < check.checkDate) return true;
-      return c.createdAt.getTime() <= check.createdAt.getTime();
-    });
-
-    return isLatest;
   });
 
   const attentionRecords = allChecks.flatMap((check) =>

@@ -117,6 +117,7 @@ export const notebookChecks = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     topicId: uuid("topic_id")
       .notNull()
+      .unique()
       .references(() => topics.id, { onDelete: "cascade" }),
     checkDate: date("check_date").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
@@ -181,12 +182,12 @@ export const studentsRelations = relations(students, ({ one, many }) => ({
   checkRecords: many(studentCheckRecords),
 }));
 
-export const topicsRelations = relations(topics, ({ one, many }) => ({
+export const topicsRelations = relations(topics, ({ one }) => ({
   class: one(classes, {
     fields: [topics.classId],
     references: [classes.id],
   }),
-  notebookChecks: many(notebookChecks),
+  notebookCheck: one(notebookChecks),
 }));
 
 export const notebookChecksRelations = relations(

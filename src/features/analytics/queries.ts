@@ -12,7 +12,7 @@ export async function getAnalyticsData() {
     with: {
       topics: {
         with: {
-          notebookChecks: {
+          notebookCheck: {
             with: {
               studentRecords: true,
             },
@@ -24,7 +24,7 @@ export async function getAnalyticsData() {
 
   const classSeries = classes.map((classItem) => {
     const records = classItem.topics.flatMap((topic) =>
-      topic.notebookChecks.flatMap((check) => check.studentRecords),
+      topic.notebookCheck ? topic.notebookCheck.studentRecords : [],
     );
     const completionEligible = records.filter(
       (record) => record.completionStatus !== null,
@@ -53,7 +53,7 @@ export async function getAnalyticsData() {
 
   for (const classItem of classes) {
     for (const topic of classItem.topics) {
-      const records = topic.notebookChecks.flatMap((check) => check.studentRecords);
+      const records = topic.notebookCheck ? topic.notebookCheck.studentRecords : [];
       const issueCount = records.filter(
         (record) =>
           record.submissionStatus === "NOT_SUBMITTED" ||

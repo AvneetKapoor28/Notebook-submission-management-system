@@ -38,13 +38,19 @@ export default async function StudentProfilePage({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader
-        eyebrow={student.class.name}
+        breadcrumbs={[
+          { label: "Classes", href: "/classes" },
+          { label: student.class.name, href: `/classes/${student.class.id}` },
+          { label: "Students" },
+          { label: student.name }
+        ]}
+        emoji="👤"
         title={`${student.rollNumber}. ${student.name}`}
         description={
           student.isActive
-            ? "Active student"
+            ? "Active student roster member"
             : "Inactive student. Historical records are preserved."
         }
       />
@@ -55,47 +61,47 @@ export default async function StudentProfilePage({
         <MetricCard label="Correction count" value={student.correctionCount} />
       </section>
 
-      <Card className="bg-white/90">
-        <CardHeader>
-          <CardTitle>Timeline</CardTitle>
-          <CardDescription>
+      <Card className="shadow-none border-border/80 bg-card">
+        <CardHeader className="p-5">
+          <CardTitle className="text-base font-semibold">Timeline Journal</CardTitle>
+          <CardDescription className="text-xs">
             Every notebook check for this student in chronological order.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="p-0">
+          <div className="overflow-x-auto border-t border-border/40">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>Submission</TableHead>
-                  <TableHead>Completion</TableHead>
-                  <TableHead>Remarks</TableHead>
+                <TableRow className="bg-neutral-50/50">
+                  <TableHead className="py-2.5 text-xs font-semibold">Date</TableHead>
+                  <TableHead className="py-2.5 text-xs font-semibold">Topic</TableHead>
+                  <TableHead className="py-2.5 text-xs font-semibold">Submission</TableHead>
+                  <TableHead className="py-2.5 text-xs font-semibold">Completion</TableHead>
+                  <TableHead className="py-2.5 text-xs font-semibold">Remarks</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {student.timeline.map((record) => (
-                  <TableRow key={record.id}>
-                    <TableCell>{formatShortDate(record.checkDate)}</TableCell>
-                    <TableCell>
+                  <TableRow key={record.id} className="hover:bg-neutral-50/40">
+                    <TableCell className="text-xs text-muted-foreground py-2.5">{formatShortDate(record.checkDate)}</TableCell>
+                    <TableCell className="py-2.5">
                       <div>
-                        <p className="font-medium">{record.topic}</p>
-                        <p className="text-xs text-muted-foreground">{record.chapter}</p>
+                        <p className="font-semibold text-sm text-foreground">{record.topic}</p>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">{record.chapter}</p>
                       </div>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="py-2.5">
                       <SubmissionStatusBadge status={record.submissionStatus} />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="py-2.5">
                       {record.completionStatus ? (
                         <CompletionStatusBadge status={record.completionStatus} />
                       ) : (
-                        <Badge variant="gray">N/A</Badge>
+                        <span className="text-xs font-semibold text-muted-foreground bg-gray-50 border border-gray-200/50 px-1.5 py-0.5 rounded">N/A</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
+                    <TableCell className="text-xs text-muted-foreground py-2.5 leading-relaxed font-sans">
                       {[...record.remarkTags, record.remarks]
                         .filter(Boolean)
                         .join(", ") || "—"}

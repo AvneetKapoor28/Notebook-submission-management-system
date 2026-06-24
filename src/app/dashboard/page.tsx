@@ -19,13 +19,13 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader
-        eyebrow="Teacher dashboard"
+        emoji="📝"
         title="Today’s notebook priorities"
         description="Focus the day around fresh checks, pending corrections, and students who need intervention."
         actions={
-          <Button asChild>
+          <Button asChild variant="outline">
             <Link href="/classes">Manage classes</Link>
           </Button>
         }
@@ -33,49 +33,52 @@ export default async function DashboardPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <MetricCard
           detail="Active teaching groups"
-          icon={<BookOpen className="size-5" />}
+          icon={<BookOpen className="size-4" />}
           label="Total classes"
           value={data.totalClasses}
         />
         <MetricCard
           detail="Across all rosters"
-          icon={<Users className="size-5" />}
+          icon={<Users className="size-4" />}
           label="Total students"
           value={data.totalStudents}
         />
         <MetricCard
-          detail="Checks still waiting for follow-up"
-          icon={<AlertCircle className="size-5" />}
+          detail="Checks waiting for correction"
+          icon={<AlertCircle className="size-4" />}
           label="Pending corrections"
           value={data.pendingCorrections.length}
         />
         <MetricCard
-          detail="Students above default thresholds"
-          icon={<Clock3 className="size-5" />}
+          detail="Students above threshold"
+          icon={<Clock3 className="size-4" />}
           label="Defaulters"
           value={data.defaulterSummary.total}
         />
       </section>
 
       <section className="grid gap-6 xl:grid-cols-3">
-        <Card className="bg-white/90 xl:col-span-2">
-          <CardHeader>
-            <CardTitle>Recent notebook checks</CardTitle>
-            <CardDescription>Jump back into the most recent work quickly.</CardDescription>
+        <Card className="xl:col-span-2 shadow-none border-border/80 bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-base font-semibold">Recent notebook checks</CardTitle>
+            <CardDescription className="text-xs">Jump back into the most recent checks quickly.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 px-5 pb-5 pt-0">
             {data.recentChecks.length ? (
               data.recentChecks.map((check) => (
                 <Link
                   key={check.id}
-                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/80 px-4 py-3 transition hover:border-emerald-200 hover:bg-emerald-50/60"
+                  className="flex items-center justify-between rounded border border-border/60 bg-card px-4 py-2.5 transition hover:bg-neutral-50/50 hover:border-neutral-300"
                   href={`/checks/${check.id}`}
                 >
-                  <div>
-                    <p className="font-medium">{check.topicTitle}</p>
-                    <p className="text-sm text-muted-foreground">{check.className}</p>
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-sm select-none">📓</span>
+                    <div className="truncate">
+                      <p className="font-medium text-sm text-foreground leading-none">{check.topicTitle}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-none">{check.className}</p>
+                    </div>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground shrink-0">
                     {formatShortDate(check.checkDate)}
                   </p>
                 </Link>
@@ -91,23 +94,23 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white/90">
-          <CardHeader>
-            <CardTitle>Defaulter summary</CardTitle>
-            <CardDescription>Highest-risk cases based on default thresholds.</CardDescription>
+        <Card className="shadow-none border-border/80 bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-base font-semibold">Defaulter summary</CardTitle>
+            <CardDescription className="text-xs font-normal">Highest-risk cases based on active thresholds.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-2xl bg-muted/30 px-4 py-3">
-              <p className="text-sm text-muted-foreground">Missing-heavy students</p>
-              <p className="mt-1 text-2xl font-semibold">{data.defaulterSummary.missing}</p>
+          <CardContent className="space-y-3 px-5 pb-5 pt-0">
+            <div className="rounded border border-border/60 bg-neutral-50/30 px-4 py-3">
+              <p className="text-xs font-semibold text-muted-foreground/80">Missing-heavy students</p>
+              <p className="mt-1 font-heading text-2xl font-bold">{data.defaulterSummary.missing}</p>
             </div>
-            <div className="rounded-2xl bg-muted/30 px-4 py-3">
-              <p className="text-sm text-muted-foreground">Correction-heavy students</p>
-              <p className="mt-1 text-2xl font-semibold">
+            <div className="rounded border border-border/60 bg-neutral-50/30 px-4 py-3">
+              <p className="text-xs font-semibold text-muted-foreground/80">Correction-heavy students</p>
+              <p className="mt-1 font-heading text-2xl font-bold">
                 {data.defaulterSummary.corrections}
               </p>
             </div>
-            <Button asChild className="w-full" variant="outline">
+            <Button asChild className="w-full text-xs" variant="outline" size="sm">
               <Link href="/defaulters">Open defaulters view</Link>
             </Button>
           </CardContent>
@@ -115,63 +118,70 @@ export default async function DashboardPage() {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-2">
-        <Card className="bg-white/90">
-          <CardHeader>
-            <CardTitle>Students requiring attention</CardTitle>
-            <CardDescription>
+        <Card className="shadow-none border-border/80 bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-base font-semibold">Students requiring attention</CardTitle>
+            <CardDescription className="text-xs">
               Top students crossing the current intervention threshold.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 px-5 pb-5 pt-0">
             {data.attentionStudents.length ? (
               data.attentionStudents.map((student) => (
                 <Link
                   key={student.studentId}
-                  className="block rounded-2xl border border-border/70 bg-background/80 px-4 py-3 transition hover:border-amber-200 hover:bg-amber-50/50"
+                  className="block rounded border border-border/60 bg-card px-4 py-3 transition hover:bg-neutral-50/50 hover:border-neutral-300"
                   href={`/students/${student.studentId}`}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="font-medium">{student.studentName}</p>
-                      <p className="text-sm text-muted-foreground">{student.className}</p>
+                    <div className="flex items-center gap-2 truncate">
+                      <span className="text-sm select-none">👤</span>
+                      <div className="truncate">
+                        <p className="font-medium text-sm text-foreground leading-none">{student.studentName}</p>
+                        <p className="text-xs text-muted-foreground mt-1 leading-none">{student.className}</p>
+                      </div>
                     </div>
-                    <p className="text-sm font-medium text-amber-700">{student.score} pts</p>
+                    <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200/50 px-1.5 py-0.5 rounded shrink-0">{student.score} pts</span>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed pl-6">
                     {student.reasons.join(", ")}
                   </p>
                 </Link>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs text-muted-foreground py-2">
                 No students are crossing the current default thresholds yet.
               </p>
             )}
           </CardContent>
         </Card>
-        <Card className="bg-white/90">
-          <CardHeader>
-            <CardTitle>Frequent late submitters</CardTitle>
-            <CardDescription>Useful for quick follow-up before class starts.</CardDescription>
+
+        <Card className="shadow-none border-border/80 bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-base font-semibold">Frequent late submitters</CardTitle>
+            <CardDescription className="text-xs font-normal">Useful for quick follow-up before class starts.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-2 px-5 pb-5 pt-0">
             {data.lateSubmitters.length ? (
               data.lateSubmitters.map((student) => (
                 <div
                   key={student.studentId}
-                  className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/80 px-4 py-3"
+                  className="flex items-center justify-between rounded border border-border/60 bg-card px-4 py-2.5"
                 >
-                  <div>
-                    <p className="font-medium">{student.studentName}</p>
-                    <p className="text-sm text-muted-foreground">{student.className}</p>
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-sm select-none">👤</span>
+                    <div className="truncate">
+                      <p className="font-medium text-sm text-foreground leading-none">{student.studentName}</p>
+                      <p className="text-xs text-muted-foreground mt-1 leading-none">{student.className}</p>
+                    </div>
                   </div>
-                  <p className="text-sm font-medium text-amber-700">
+                  <span className="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200/50 px-1.5 py-0.5 rounded shrink-0">
                     {student.lateCount} late
-                  </p>
+                  </span>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">No recurring late submitters yet.</p>
+              <p className="text-xs text-muted-foreground py-2">No recurring late submitters yet.</p>
             )}
           </CardContent>
         </Card>

@@ -18,8 +18,10 @@ export async function getNotebookCheckSetup(topicId: string) {
           },
         },
       },
-      notebookChecks: {
-        orderBy: (table, { desc }) => [desc(table.checkDate)],
+      notebookCheck: {
+        with: {
+          studentRecords: true,
+        },
       },
     },
   });

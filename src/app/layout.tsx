@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppShell } from "@/components/app/app-shell";
 import { ClientProviders } from "@/components/app/client-providers";
 import { APP_NAME } from "@/lib/constants";
+import { listClassesOverview } from "@/features/classes/queries";
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -12,15 +13,17 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const classes = await listClassesOverview().catch(() => []);
+
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
-        <AppShell>{children}</AppShell>
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <AppShell classes={classes}>{children}</AppShell>
         <ClientProviders />
       </body>
     </html>

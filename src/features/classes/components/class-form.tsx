@@ -17,7 +17,13 @@ import {
   type ClassFormValues,
 } from "@/features/classes/schemas";
 
-export function ClassForm() {
+export function ClassForm({
+  onSuccess,
+  layout = "dialog",
+}: {
+  onSuccess?: () => void;
+  layout?: "dialog" | "grid";
+}) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const {
@@ -44,12 +50,39 @@ export function ClassForm() {
 
       toast.success(result.message);
       reset({ name: "", academicYear: values.academicYear });
+      onSuccess?.();
       router.refresh();
     });
   });
 
+  if (layout === "grid") {
+    return (
+      <form className="grid gap-4 sm:grid-cols-3" onSubmit={onSubmit}>
+        <div className="space-y-2">
+          <Label htmlFor="class-name">Class name</Label>
+          <Input id="class-name" placeholder="Grade 8 - A" {...register("name")} />
+          <FormMessage message={errors.name?.message} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="academic-year">Academic year</Label>
+          <Input
+            id="academic-year"
+            placeholder="2026-2027"
+            {...register("academicYear")}
+          />
+          <FormMessage message={errors.academicYear?.message} />
+        </div>
+        <div className="flex items-end">
+          <Button className="w-full" disabled={isPending} type="submit">
+            {isPending ? "Saving..." : "Create class"}
+          </Button>
+        </div>
+      </form>
+    );
+  }
+
   return (
-    <form className="grid gap-4 sm:grid-cols-3" onSubmit={onSubmit}>
+    <form className="space-y-4" onSubmit={onSubmit}>
       <div className="space-y-2">
         <Label htmlFor="class-name">Class name</Label>
         <Input id="class-name" placeholder="Grade 8 - A" {...register("name")} />
@@ -64,7 +97,7 @@ export function ClassForm() {
         />
         <FormMessage message={errors.academicYear?.message} />
       </div>
-      <div className="flex items-end">
+      <div className="pt-2">
         <Button className="w-full" disabled={isPending} type="submit">
           {isPending ? "Saving..." : "Create class"}
         </Button>

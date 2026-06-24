@@ -37,7 +37,7 @@ export default async function TopicDetailPage({
     notFound();
   }
 
-  const lastCheck = topic.notebookChecks[0];
+  const lastCheck = topic.notebookCheck;
   const lastCompletionRate = lastCheck
     ? (() => {
         const eligible = lastCheck.studentRecords.filter(
@@ -52,85 +52,101 @@ export default async function TopicDetailPage({
     : null;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader
-        eyebrow={topic.class.name}
+        breadcrumbs={[
+          { label: "Classes", href: "/classes" },
+          { label: topic.class.name, href: `/classes/${classId}` },
+          { label: "Topics" },
+          { label: topic.title }
+        ]}
+        emoji="📓"
         title={topic.title}
         description={`Chapter ${topic.chapter}. Last checked ${formatShortDate(lastCheck?.checkDate ?? null)} with completion rate ${formatPercent(lastCompletionRate)}.`}
         actions={
-          <Button asChild>
+          <Button asChild size="sm" variant={lastCheck ? "outline" : "default"}>
             <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
-              Start notebook check
+              {lastCheck ? "Edit notebook check" : "Start notebook check"}
             </Link>
           </Button>
         }
       />
 
-      <Card className="bg-white/90">
-        <CardHeader>
-          <CardTitle>Check history</CardTitle>
-          <CardDescription>
-            See exactly when this topic was checked and how that check performed.
+      <Card className="shadow-none border-border/80 bg-card">
+        <CardHeader className="p-5">
+          <CardTitle className="text-base font-semibold">Notebook check status</CardTitle>
+          <CardDescription className="text-xs">
+            {lastCheck
+              ? "A notebook check has been completed for this topic."
+              : "No notebook check has been recorded yet."}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {topic.notebookChecks.map((check) => {
-            const eligible = check.studentRecords.filter(
-              (record) => record.completionStatus !== null,
-            );
-            const completed = eligible.filter(
-              (record) => record.completionStatus === "COMPLETE",
-            ).length;
-            const completionRate = eligible.length
-              ? (completed / eligible.length) * 100
-              : null;
-
-            return (
-              <div
-                key={check.id}
-                className="rounded-3xl border border-border/70 bg-background/80 p-4"
-              >
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <CardContent className="px-5 pb-5 pt-0">
+          {lastCheck ? (
+            <div className="rounded border border-border/60 bg-card p-3.5 hover:bg-neutral-50/30 transition-colors">
+              <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm select-none">📅</span>
                   <div>
-                    <p className="font-medium">
-                      Notebook check
+                    <p className="font-semibold text-sm text-foreground leading-none">
+                      Notebook check completed
                     </p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatShortDate(check.checkDate)} • {check.studentRecords.length} records
+                    <p className="text-xs text-muted-foreground mt-1 leading-none">
+                      Checked on {formatShortDate(lastCheck.checkDate)} • {lastCheck.studentRecords.length} records
                     </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <p className="text-sm font-medium text-emerald-700">
-                      {formatPercent(completionRate)} complete
-                    </p>
-                    <Button asChild size="sm" variant="outline">
-                      <Link href={`/checks/${check.id}`}>Open check</Link>
-                    </Button>
                   </div>
                 </div>
+                <div className="flex items-center gap-3">
+                  {lastCompletionRate !== null && (
+                    <span className="text-xs font-bold text-emerald-800 bg-green-50 border border-green-200/50 px-1.5 py-0.5 rounded">
+                      {formatPercent(lastCompletionRate)} complete
+                    </span>
+                  )}
+                  <Button asChild size="xs" variant="outline" className="mr-1.5">
+                    <Link href={`/checks/${lastCheck.id}`}>Open details</Link>
+                  </Button>
+                  <Button asChild size="xs">
+                    <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
+                      Edit check
+                    </Link>
+                  </Button>
+                </div>
               </div>
-            );
-          })}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-center rounded border border-dashed border-border/60 bg-neutral-50/10">
+              <span className="text-3xl mb-2 select-none">📓</span>
+              <p className="text-sm font-semibold text-foreground">No checks completed</p>
+              <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                Assess submissions and completion to calculate stats for this topic.
+              </p>
+              <Button asChild size="sm" className="mt-4">
+                <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>
+                  Start check
+                </Link>
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 
       {lastCheck ? (
-        <Card className="bg-white/90">
-          <CardHeader>
-            <CardTitle>Latest check snapshot</CardTitle>
-            <CardDescription>
+        <Card className="shadow-none border-border/80 bg-card">
+          <CardHeader className="p-5">
+            <CardTitle className="text-base font-semibold">Latest check snapshot</CardTitle>
+            <CardDescription className="text-xs">
               Recent outcomes for quick topic-level follow-up.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto border-t border-border/40">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Student</TableHead>
-                    <TableHead>Submission</TableHead>
-                    <TableHead>Completion</TableHead>
-                    <TableHead>Remarks</TableHead>
+                  <TableRow className="bg-neutral-50/50">
+                    <TableHead className="py-2.5 text-xs font-semibold">Student</TableHead>
+                    <TableHead className="py-2.5 text-xs font-semibold">Submission</TableHead>
+                    <TableHead className="py-2.5 text-xs font-semibold">Completion</TableHead>
+                    <TableHead className="py-2.5 text-xs font-semibold">Remarks</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -140,21 +156,21 @@ export default async function TopicDetailPage({
                         left.student.rollNumber - right.student.rollNumber,
                     )
                     .map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell className="font-medium">
+                      <TableRow key={record.id} className="hover:bg-neutral-50/40">
+                        <TableCell className="font-semibold text-sm py-2.5">
                           {record.student.rollNumber}. {record.student.name}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2.5">
                           <SubmissionStatusBadge status={record.submissionStatus} />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="py-2.5">
                           {record.completionStatus ? (
                             <CompletionStatusBadge status={record.completionStatus} />
                           ) : (
-                            <span className="text-sm text-muted-foreground">N/A</span>
+                            <span className="text-xs font-semibold text-muted-foreground bg-gray-50 border border-gray-200/50 px-1.5 py-0.5 rounded">N/A</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
+                        <TableCell className="text-xs text-muted-foreground py-2.5">
                           {[...record.remarkTags, record.remarks]
                             .filter(Boolean)
                             .join(", ") || "—"}

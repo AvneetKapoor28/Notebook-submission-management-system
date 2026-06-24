@@ -30,11 +30,7 @@ export async function listClassesOverview() {
       students: true,
       topics: {
         with: {
-          notebookChecks: {
-            orderBy: (table, { desc: orderDesc }) => [
-              orderDesc(table.checkDate),
-            ],
-          },
+          notebookCheck: true,
         },
       },
     },
@@ -42,18 +38,23 @@ export async function listClassesOverview() {
 
   return classes.map((classItem) => {
     const activeStudents = classItem.students.filter((student) => student.isActive);
-    const latestCheck = classItem.topics
-      .flatMap((topic) => topic.notebookChecks)
-      .sort((left, right) =>
-        right.checkDate.localeCompare(left.checkDate),
-      )[0];
+    const topicsWithChecks = classItem.topics
+      .filter((topic) => topic.notebookCheck !== null)
+      .sort((left, right) => {
+        const leftDate = left.notebookCheck?.checkDate ?? "";
+        const rightDate = right.notebookCheck?.checkDate ?? "";
+        return rightDate.localeCompare(leftDate);
+      });
+
+    const latestTopic = topicsWithChecks[0] ?? null;
 
     return {
       ...classItem,
       studentCount: classItem.students.length,
       activeStudentCount: activeStudents.length,
       topicCount: classItem.topics.length,
-      latestCheckDate: latestCheck?.checkDate ?? null,
+      latestCheckDate: latestTopic?.notebookCheck?.checkDate ?? null,
+      latestCheckTopicName: latestTopic?.title ?? null,
     };
   });
 }
@@ -72,10 +73,7 @@ export async function getClassDetail(classId: string) {
       topics: {
         orderBy: (table, { desc: orderDesc }) => [orderDesc(table.dateTaught)],
         with: {
-          notebookChecks: {
-            orderBy: (table, { desc: orderDesc }) => [
-              orderDesc(table.checkDate),
-            ],
+          notebookCheck: {
             with: {
               studentRecords: true,
             },
@@ -90,7 +88,7 @@ export async function getClassDetail(classId: string) {
   }
 
   const topics = classItem.topics.map((topic) => {
-    const lastCheck = topic.notebookChecks[0] ?? null;
+    const lastCheck = topic.notebookCheck ?? null;
 
     return {
       ...topic,
@@ -98,7 +96,7 @@ export async function getClassDetail(classId: string) {
       completionRate: lastCheck
         ? calculateCompletionRate(lastCheck.studentRecords)
         : null,
-      checkCount: topic.notebookChecks.length,
+      checkCount: lastCheck ? 1 : 0,
     };
   });
 

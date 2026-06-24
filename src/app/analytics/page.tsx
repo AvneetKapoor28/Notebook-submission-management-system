@@ -6,11 +6,12 @@ export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-300">
       <PageHeader
-        eyebrow="Analytics"
+        breadcrumbs={[{ label: "Analytics" }, { label: "Outcome trends" }]}
+        emoji="📊"
         title="Outcome trends"
-        description="Charts are phase-three polish, but these reports already expose which classes and topics are struggling."
+        description="View reports of how classes and topics are performing over time."
       />
       <AnalyticsCharts
         classSeries={data.classSeries}

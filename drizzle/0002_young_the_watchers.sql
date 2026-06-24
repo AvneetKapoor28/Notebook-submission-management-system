@@ -1,0 +1,1 @@
+ALTER TABLE "notebook_checks" ADD CONSTRAINT "notebook_checks_topic_id_unique" UNIQUE("topic_id");

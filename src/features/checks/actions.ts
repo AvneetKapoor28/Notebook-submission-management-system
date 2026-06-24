@@ -35,14 +35,34 @@ export async function createNotebookCheckAction(values: NotebookCheckFormValues)
     return failureResult("Topic not found.");
   }
 
+  const existingCheck = await db.query.notebookChecks.findFirst({
+    where: eq(schema.notebookChecks.topicId, parsed.data.topicId),
+  });
+  const isUpdate = !!existingCheck;
+
   const result = await db.transaction(async (tx) => {
-    const [check] = await tx
-      .insert(schema.notebookChecks)
-      .values({
-        topicId: parsed.data.topicId,
-        checkDate: parsed.data.checkDate,
-      })
-      .returning();
+    let check;
+    if (isUpdate && existingCheck) {
+      [check] = await tx
+        .update(schema.notebookChecks)
+        .set({
+          checkDate: parsed.data.checkDate,
+        })
+        .where(eq(schema.notebookChecks.id, existingCheck.id))
+        .returning();
+
+      await tx
+        .delete(schema.studentCheckRecords)
+        .where(eq(schema.studentCheckRecords.notebookCheckId, existingCheck.id));
+    } else {
+      [check] = await tx
+        .insert(schema.notebookChecks)
+        .values({
+          topicId: parsed.data.topicId,
+          checkDate: parsed.data.checkDate,
+        })
+        .returning();
+    }
 
     await tx.insert(schema.studentCheckRecords).values(
       parsed.data.records.map((record) => ({
@@ -64,9 +84,12 @@ export async function createNotebookCheckAction(values: NotebookCheckFormValues)
   revalidatePath("/defaulters");
   revalidatePath("/analytics");
 
-  return successResult("Notebook check saved.", {
-    checkId: result.id,
-    topicId: topic.id,
-    classId: topic.classId,
-  });
+  return successResult(
+    isUpdate ? "Notebook check updated." : "Notebook check saved.",
+    {
+      checkId: result.id,
+      topicId: topic.id,
+      classId: topic.classId,
+    },
+  );
 }
