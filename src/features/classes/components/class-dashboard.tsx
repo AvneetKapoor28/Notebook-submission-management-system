@@ -116,7 +116,12 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
           {/* Compact slide down container for creating new topic */}
           {showTopicForm && (
             <div className="p-4 border border-border/60 bg-neutral-50/15 rounded-xl animate-in fade-in slide-in-from-top-3 duration-200">
-              <TopicForm classId={classItem.id} />
+              <TopicForm
+                classId={classItem.id}
+                existingChapters={Array.from(
+                  new Set(classItem.topics.map((t) => t.chapter).filter(Boolean))
+                )}
+              />
             </div>
           )}
 
