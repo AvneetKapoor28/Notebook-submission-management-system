@@ -93,9 +93,7 @@ export default async function TopicDetailPage({
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="font-medium">
-                      {check.checkType === "REGULAR_CHECK"
-                        ? "Regular check"
-                        : "Correction check"}
+                      Notebook check
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {formatShortDate(check.checkDate)} • {check.studentRecords.length} records

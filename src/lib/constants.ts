@@ -15,10 +15,6 @@ export const REMARK_TAGS = [
   "Untidy Work",
 ] as const;
 
-export const NOTEBOOK_CHECK_TYPES = [
-  "REGULAR_CHECK",
-  "CORRECTION_CHECK",
-] as const;
 
 export const SUBMISSION_STATUSES = [
   "SUBMITTED",

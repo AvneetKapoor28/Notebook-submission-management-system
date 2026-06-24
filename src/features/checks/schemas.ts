@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import {
   COMPLETION_STATUSES,
-  NOTEBOOK_CHECK_TYPES,
   REMARK_TAGS,
   SUBMISSION_STATUSES,
 } from "@/lib/constants";
@@ -33,32 +32,12 @@ export const notebookCheckRecordSchema = z
     }
   });
 
-export const notebookCheckFormSchema = z
-  .object({
-    topicId: z.string().uuid(),
-    checkType: z.enum(NOTEBOOK_CHECK_TYPES),
-    checkDate: z.string().min(1, "Check date is required."),
-    sourceCheckId: z.string().uuid().nullable(),
-    records: z
-      .array(notebookCheckRecordSchema)
-      .min(1, "At least one student is required."),
-  })
-  .superRefine((value, context) => {
-    if (value.checkType === "CORRECTION_CHECK" && !value.sourceCheckId) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["sourceCheckId"],
-        message: "Correction checks must link to the earlier check.",
-      });
-    }
-
-    if (value.checkType === "REGULAR_CHECK" && value.sourceCheckId) {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["sourceCheckId"],
-        message: "Regular checks cannot link to an earlier correction.",
-      });
-    }
-  });
+export const notebookCheckFormSchema = z.object({
+  topicId: z.string().uuid(),
+  checkDate: z.string().min(1, "Check date is required."),
+  records: z
+    .array(notebookCheckRecordSchema)
+    .min(1, "At least one student is required."),
+});
 
 export type NotebookCheckFormValues = z.infer<typeof notebookCheckFormSchema>;

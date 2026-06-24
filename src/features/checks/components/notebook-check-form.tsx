@@ -34,7 +34,6 @@ import {
   COMPLETION_STATUSES,
   COMPLETION_STATUS_LABELS,
   COMPLETION_STATUS_SHORTCUTS,
-  NOTEBOOK_CHECK_TYPES,
   REMARK_TAGS,
   SUBMISSION_STATUSES,
   SUBMISSION_STATUS_LABELS,
@@ -48,29 +47,23 @@ type Student = {
   rollNumber: number;
 };
 
-type SourceCheck = {
-  id: string;
-  checkDate: string;
-  checkType: string;
-};
+
 
 type DraftPayload = {
   updatedAt: string;
   values: NotebookCheckFormValues;
 };
 
-function draftKey(topicId: string, checkType: string, checkDate: string) {
-  return `notebook-draft:${topicId}:${checkType}:${checkDate}`;
+function draftKey(topicId: string, checkDate: string) {
+  return `notebook-draft:${topicId}:${checkDate}`;
 }
 
 export function NotebookCheckForm({
   topicId,
   students,
-  sourceChecks,
 }: {
   topicId: string;
   students: Student[];
-  sourceChecks: SourceCheck[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -80,9 +73,7 @@ export function NotebookCheckForm({
   const defaultValues = useMemo<NotebookCheckFormValues>(
     () => ({
       topicId,
-      checkType: "REGULAR_CHECK",
       checkDate: new Date().toISOString().slice(0, 10),
-      sourceCheckId: null,
       records: students.map((student) => ({
         studentId: student.id,
         submissionStatus: "SUBMITTED",
@@ -100,10 +91,9 @@ export function NotebookCheckForm({
   });
   const { control, formState, getValues, handleSubmit, reset, setValue } = form;
   const { fields } = useFieldArray({ control, name: "records" });
-  const watchedCheckType = useWatch({ control, name: "checkType" });
   const watchedCheckDate = useWatch({ control, name: "checkDate" });
   const watchedRecords = useWatch({ control, name: "records" });
-  const currentDraftKey = draftKey(topicId, watchedCheckType, watchedCheckDate);
+  const currentDraftKey = draftKey(topicId, watchedCheckDate);
 
   const [draftCandidate, setDraftCandidate] = useState<DraftPayload | null>(() => {
     if (typeof window === "undefined") {
@@ -357,45 +347,13 @@ export function NotebookCheckForm({
       ) : null}
 
       <div className="grid gap-4 rounded-[2rem] border border-border/70 bg-white/90 p-5 lg:grid-cols-[1fr_auto]">
-        <div className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <label className="text-sm font-medium" htmlFor="check-type">
-              Check type
-            </label>
-            <Select id="check-type" {...form.register("checkType")}>
-              {NOTEBOOK_CHECK_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type === "REGULAR_CHECK" ? "Regular check" : "Correction check"}
-                </option>
-              ))}
-            </Select>
-          </div>
+        <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="check-date">
               Check date
             </label>
             <Input id="check-date" type="date" {...form.register("checkDate")} />
           </div>
-          {watchedCheckType === "CORRECTION_CHECK" ? (
-            <div className="space-y-2">
-              <label className="text-sm font-medium" htmlFor="source-check">
-                Linked source check
-              </label>
-              <Select
-                id="source-check"
-                {...form.register("sourceCheckId", {
-                  setValueAs: (value) => value || null,
-                })}
-              >
-                <option value="">Select source check</option>
-                {sourceChecks.map((check) => (
-                  <option key={check.id} value={check.id}>
-                    {new Date(check.checkDate).toLocaleDateString()}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          ) : null}
         </div>
         <div className="flex flex-wrap items-start gap-2 lg:justify-end">
           <Button onClick={markAllSubmitted} type="button" variant="outline">

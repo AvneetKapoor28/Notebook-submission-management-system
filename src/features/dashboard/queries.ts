@@ -42,13 +42,22 @@ export async function getDashboardData() {
     .sort((left, right) => right.checkDate.localeCompare(left.checkDate))
     .slice(0, 5);
 
-  const pendingCorrections = allChecks.filter(
-    (check) =>
-      check.studentRecords.some(
-        (record) => record.completionStatus === "NEEDS_CORRECTION",
-      ) &&
-      !allChecks.some((candidate) => candidate.sourceCheckId === check.id),
-  );
+  const pendingCorrections = allChecks.filter((check) => {
+    const hasNeedsCorrection = check.studentRecords.some(
+      (record) => record.completionStatus === "NEEDS_CORRECTION",
+    );
+    if (!hasNeedsCorrection) return false;
+
+    const topicChecks = allChecks.filter((c) => c.topicId === check.topicId);
+    const isLatest = topicChecks.every((c) => {
+      if (c.id === check.id) return true;
+      if (c.checkDate > check.checkDate) return false;
+      if (c.checkDate < check.checkDate) return true;
+      return c.createdAt.getTime() <= check.createdAt.getTime();
+    });
+
+    return isLatest;
+  });
 
   const attentionRecords = allChecks.flatMap((check) =>
     check.studentRecords.map((record) => {

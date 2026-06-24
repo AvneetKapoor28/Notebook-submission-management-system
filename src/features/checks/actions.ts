@@ -35,30 +35,12 @@ export async function createNotebookCheckAction(values: NotebookCheckFormValues)
     return failureResult("Topic not found.");
   }
 
-  if (parsed.data.checkType === "CORRECTION_CHECK" && parsed.data.sourceCheckId) {
-    const sourceCheck = await db.query.notebookChecks.findFirst({
-      where: and(
-        eq(schema.notebookChecks.id, parsed.data.sourceCheckId),
-        eq(schema.notebookChecks.topicId, topic.id),
-      ),
-    });
-
-    if (!sourceCheck) {
-      return failureResult("Linked source check was not found.");
-    }
-  }
-
   const result = await db.transaction(async (tx) => {
     const [check] = await tx
       .insert(schema.notebookChecks)
       .values({
         topicId: parsed.data.topicId,
-        checkType: parsed.data.checkType,
         checkDate: parsed.data.checkDate,
-        sourceCheckId:
-          parsed.data.checkType === "CORRECTION_CHECK"
-            ? parsed.data.sourceCheckId
-            : null,
       })
       .returning();
 

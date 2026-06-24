@@ -31,7 +31,6 @@ export async function getNotebookCheckSetup(topicId: string) {
   return {
     topic,
     students: topic.class.students,
-    availableSourceChecks: topic.notebookChecks,
   };
 }
 
@@ -45,7 +44,7 @@ export async function getNotebookCheckDetail(checkId: string) {
           class: true,
         },
       },
-      sourceCheck: true,
+
       studentRecords: {
         with: {
           student: true,

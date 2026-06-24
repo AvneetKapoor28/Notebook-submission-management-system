@@ -276,8 +276,8 @@ async function seed() {
         const regularCheckDate = addDays(dateTaught, 3);
 
         await tx`
-          insert into notebook_checks (id, topic_id, check_type, check_date)
-          values (${regularCheckId}, ${topicId}, 'REGULAR_CHECK', ${regularCheckDate})
+          insert into notebook_checks (id, topic_id, check_date)
+          values (${regularCheckId}, ${topicId}, ${regularCheckDate})
         `;
 
         for (const [studentIndex, student] of students.entries()) {
@@ -325,16 +325,12 @@ async function seed() {
             insert into notebook_checks (
               id,
               topic_id,
-              check_type,
-              check_date,
-              source_check_id
+              check_date
             )
             values (
               ${correctionCheckId},
               ${topicId},
-              'CORRECTION_CHECK',
-              ${correctionCheckDate},
-              ${regularCheckId}
+              ${correctionCheckDate}
             )
           `;
 

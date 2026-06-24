@@ -69,7 +69,6 @@ export default async function StudentProfilePage({
                 <TableRow>
                   <TableHead>Date</TableHead>
                   <TableHead>Topic</TableHead>
-                  <TableHead>Check type</TableHead>
                   <TableHead>Submission</TableHead>
                   <TableHead>Completion</TableHead>
                   <TableHead>Remarks</TableHead>
@@ -85,11 +84,7 @@ export default async function StudentProfilePage({
                         <p className="text-xs text-muted-foreground">{record.chapter}</p>
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <Badge variant="neutral">
-                        {record.checkType === "REGULAR_CHECK" ? "Regular" : "Correction"}
-                      </Badge>
-                    </TableCell>
+
                     <TableCell>
                       <SubmissionStatusBadge status={record.submissionStatus} />
                     </TableCell>

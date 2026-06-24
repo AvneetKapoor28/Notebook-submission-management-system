@@ -15,11 +15,9 @@ import { relations } from "drizzle-orm";
 
 import {
   COMPLETION_STATUSES,
-  NOTEBOOK_CHECK_TYPES,
   SUBMISSION_STATUSES,
 } from "@/lib/constants";
 
-export const checkTypeEnum = pgEnum("check_type", NOTEBOOK_CHECK_TYPES);
 export const submissionStatusEnum = pgEnum(
   "submission_status",
   SUBMISSION_STATUSES,
@@ -120,18 +118,13 @@ export const notebookChecks = pgTable(
     topicId: uuid("topic_id")
       .notNull()
       .references(() => topics.id, { onDelete: "cascade" }),
-    checkType: checkTypeEnum("check_type").notNull(),
     checkDate: date("check_date").notNull(),
-    sourceCheckId: uuid("source_check_id").references((): any => notebookChecks.id, {
-      onDelete: "set null",
-    }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     index("notebook_checks_topic_date_idx").on(table.topicId, table.checkDate),
-    index("notebook_checks_source_idx").on(table.sourceCheckId),
   ],
 );
 
@@ -202,14 +195,6 @@ export const notebookChecksRelations = relations(
     topic: one(topics, {
       fields: [notebookChecks.topicId],
       references: [topics.id],
-    }),
-    sourceCheck: one(notebookChecks, {
-      fields: [notebookChecks.sourceCheckId],
-      references: [notebookChecks.id],
-      relationName: "source_check",
-    }),
-    derivedChecks: many(notebookChecks, {
-      relationName: "source_check",
     }),
     studentRecords: many(studentCheckRecords),
   }),

@@ -43,7 +43,7 @@ export default async function NotebookCheckDetailPage({
       <PageHeader
         eyebrow={check.topic.class.name}
         title={check.topic.title}
-        description={`${check.checkType === "REGULAR_CHECK" ? "Regular" : "Correction"} check from ${formatShortDate(check.checkDate)}.`}
+        description={`Check from ${formatShortDate(check.checkDate)}.`}
         actions={
           <Button asChild variant="outline">
             <Link href={`/classes/${check.topic.class.id}/topics/${check.topic.id}`}>
@@ -52,27 +52,11 @@ export default async function NotebookCheckDetailPage({
           </Button>
         }
       />
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-1">
         <Card className="bg-white/90">
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground">Students recorded</p>
             <p className="mt-2 text-3xl font-semibold">{check.studentRecords.length}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/90">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Check type</p>
-            <p className="mt-2 text-2xl font-semibold">
-              {check.checkType === "REGULAR_CHECK" ? "Regular" : "Correction"}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white/90">
-          <CardContent className="pt-6">
-            <p className="text-sm text-muted-foreground">Linked source check</p>
-            <p className="mt-2 text-2xl font-semibold">
-              {check.sourceCheckId ? "Yes" : "No"}
-            </p>
           </CardContent>
         </Card>
       </div>

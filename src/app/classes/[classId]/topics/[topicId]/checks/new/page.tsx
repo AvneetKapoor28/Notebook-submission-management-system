@@ -40,7 +40,6 @@ export default async function NewNotebookCheckPage({
         </CardHeader>
         <CardContent>
           <NotebookCheckForm
-            sourceChecks={setup.availableSourceChecks}
             students={setup.students}
             topicId={topicId}
           />
