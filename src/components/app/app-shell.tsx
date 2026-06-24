@@ -65,8 +65,8 @@ export function AppShell({
       {/* Left Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-45 flex w-60 flex-col border-r border-sidebar-border bg-sidebar px-3 py-5 transition-transform duration-200 lg:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full lg:static lg:flex lg:translate-x-0"
+          "fixed inset-y-0 left-0 z-45 flex w-60 flex-col border-r border-sidebar-border bg-sidebar px-3 py-5 transition-transform duration-200",
+          isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
         {/* Workspace Title */}
@@ -171,7 +171,7 @@ export function AppShell({
       </aside>
 
       {/* Main Workspace Pane */}
-      <div className="flex flex-1 flex-col overflow-hidden min-h-screen">
+      <div className="flex flex-1 flex-col overflow-hidden min-h-screen lg:pl-60">
         {/* Dynamic page contents */}
         <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 lg:px-12 xl:px-14 mt-12 lg:mt-0">
           <div className="mx-auto max-w-5xl">
