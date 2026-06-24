@@ -80,6 +80,7 @@ export async function getDashboardData() {
     .slice(0, 5);
 
   return {
+    teacherName: teacher.name,
     totalClasses: classes.length,
     totalStudents: allStudents.length,
     recentChecks,
