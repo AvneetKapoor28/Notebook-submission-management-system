@@ -34,12 +34,12 @@ export function DataTable<TData>({
   });
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-border/70 bg-white/90">
+    <div className="overflow-hidden rounded-2xl border border-border/50 bg-white/80 dark:bg-card/75 backdrop-blur-md shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
       <div className={cn("overflow-x-auto", maxHeightClass)}>
         <Table className="relative border-collapse">
-          <TableHeader className={cn(maxHeightClass && "sticky top-0 bg-white z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]")}>
+          <TableHeader className={cn(maxHeightClass && "sticky top-0 bg-neutral-50/90 dark:bg-neutral-900/90 backdrop-blur-sm z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]")}>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+              <TableRow key={headerGroup.id} className="hover:bg-transparent border-b border-border/40">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder
@@ -69,3 +69,4 @@ export function DataTable<TData>({
     </div>
   );
 }
+

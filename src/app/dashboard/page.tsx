@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   const data = await getDashboardData();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         emoji="📝"
         title="Today’s notebook priorities"

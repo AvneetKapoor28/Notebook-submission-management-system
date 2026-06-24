@@ -38,7 +38,7 @@ export default async function StudentProfilePage({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         breadcrumbs={[
           { label: "Classes", href: "/classes" },
@@ -61,47 +61,49 @@ export default async function StudentProfilePage({
         <MetricCard label="Correction count" value={student.correctionCount} />
       </section>
 
-      <Card className="shadow-none border-border/80 bg-card">
-        <CardHeader className="p-5">
+      <Card className="shadow-none border-border/60 bg-card rounded-2xl overflow-hidden">
+        <CardHeader className="p-5 border-b border-border/40">
           <CardTitle className="text-base font-semibold">Timeline Journal</CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground/80">
             Every notebook check for this student in chronological order.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto border-t border-border/40">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-neutral-50/50">
-                  <TableHead className="py-2.5 text-xs font-semibold">Date</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Topic</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Submission</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Completion</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Remarks</TableHead>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>Submission</TableHead>
+                  <TableHead>Completion</TableHead>
+                  <TableHead>Remarks</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {student.timeline.map((record) => (
-                  <TableRow key={record.id} className="hover:bg-neutral-50/40">
-                    <TableCell className="text-xs text-muted-foreground py-2.5">{formatShortDate(record.checkDate)}</TableCell>
-                    <TableCell className="py-2.5">
+                  <TableRow key={record.id}>
+                    <TableCell className="text-xs font-mono text-muted-foreground/70">
+                      {formatShortDate(record.checkDate)}
+                    </TableCell>
+                    <TableCell>
                       <div>
-                        <p className="font-semibold text-sm text-foreground">{record.topic}</p>
-                        <p className="text-[10px] text-muted-foreground mt-0.5">{record.chapter}</p>
+                        <p className="font-medium text-sm text-foreground">{record.topic}</p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">{record.chapter}</p>
                       </div>
                     </TableCell>
 
-                    <TableCell className="py-2.5">
+                    <TableCell>
                       <SubmissionStatusBadge status={record.submissionStatus} />
                     </TableCell>
-                    <TableCell className="py-2.5">
+                    <TableCell>
                       {record.completionStatus ? (
                         <CompletionStatusBadge status={record.completionStatus} />
                       ) : (
-                        <span className="text-xs font-semibold text-muted-foreground bg-gray-50 border border-gray-200/50 px-1.5 py-0.5 rounded">N/A</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground/50 bg-neutral-50 dark:bg-neutral-800/40 border border-border/30 px-1.5 py-0.5 rounded">N/A</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground py-2.5 leading-relaxed font-sans">
+                    <TableCell className="text-xs text-muted-foreground/80 leading-relaxed font-sans">
                       {[...record.remarkTags, record.remarks]
                         .filter(Boolean)
                         .join(", ") || "—"}

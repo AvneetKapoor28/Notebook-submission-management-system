@@ -25,7 +25,7 @@ const columns: ColumnDef<DefaulterRow, any>[] = [
     header: "Student",
     cell: (info) => (
       <Link
-        className="font-medium text-foreground hover:text-emerald-700"
+        className="font-semibold text-foreground hover:text-primary hover:underline transition-all text-xs md:text-sm"
         href={`/students/${info.row.original.studentId}`}
       >
         {info.getValue()}

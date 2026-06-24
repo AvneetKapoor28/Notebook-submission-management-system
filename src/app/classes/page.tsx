@@ -10,7 +10,7 @@ export default async function ClassesPage() {
   const classes = await listClassesOverview();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         emoji="🏫"
         title="Classes"
@@ -25,18 +25,18 @@ export default async function ClassesPage() {
             href={`/classes/${classItem.id}`}
             className="group block"
           >
-            <Card className="h-full border border-border/80 bg-card p-6 transition-all duration-300 hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 relative overflow-hidden flex flex-col justify-between">
+            <Card className="h-full border border-border/80 bg-card p-5 transition-all duration-300 hover:shadow-md hover:border-primary/40 hover:-translate-y-0.5 relative overflow-hidden flex flex-col justify-between">
               {/* Subtle top-right glow decoration */}
               <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               <div className="space-y-4">
                 <div>
-                  <h3 className="font-heading text-2xl md:text-3xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors duration-200">
+                  <h3 className="font-heading text-xl md:text-2xl font-semibold tracking-tight text-foreground group-hover:text-primary transition-colors duration-200">
                     {classItem.name}
                   </h3>
                 </div>
 
-                <div className="h-px bg-border/60 w-full" />
+                <div className="h-px bg-border/40 w-full" />
 
                 <div className="space-y-2">
                   <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/80 block">

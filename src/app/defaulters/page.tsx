@@ -17,7 +17,7 @@ export default async function DefaultersPage({
     : data.defaulters;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         breadcrumbs={[{ label: "Attention Queue" }, { label: "Defaulters" }]}
         emoji="🚨"

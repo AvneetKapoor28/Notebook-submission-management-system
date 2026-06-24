@@ -39,7 +39,7 @@ export default async function NotebookCheckDetailPage({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         breadcrumbs={[
           { label: "Classes", href: "/classes" },
@@ -65,57 +65,59 @@ export default async function NotebookCheckDetailPage({
           </div>
         }
       />
-      <div className="grid gap-4 md:grid-cols-1">
-        <Card className="shadow-none border-border/80 bg-card/40">
-          <CardContent className="flex items-center justify-between pt-5 px-5 pb-5">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">Students checked</p>
-              <p className="mt-1 font-heading text-2xl font-bold">{check.studentRecords.length}</p>
-            </div>
-            <span className="text-xl select-none">📋</span>
-          </CardContent>
-        </Card>
-      </div>
 
-      <Card className="shadow-none border-border/80 bg-card">
-        <CardHeader className="p-5">
-          <CardTitle className="text-base font-semibold">Roster outcomes</CardTitle>
-          <CardDescription className="text-xs">
-            Everything saved in one batch, in roll-number order.
-          </CardDescription>
+      <Card className="shadow-none border-border/60 bg-card rounded-2xl overflow-hidden">
+        <CardHeader className="p-5 flex flex-row items-center justify-between space-y-0 border-b border-border/40">
+          <div>
+            <CardTitle className="text-base font-semibold">Roster outcomes</CardTitle>
+            <CardDescription className="text-xs mt-0.5 text-muted-foreground/80">
+              Everything saved in one batch, in roll-number order.
+            </CardDescription>
+          </div>
+          <div className="text-right shrink-0">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Students Checked</span>
+            <span className="text-lg font-bold text-foreground leading-none mt-0.5 block">{check.studentRecords.length}</span>
+          </div>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto border-t border-border/40">
+          <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-neutral-50/50">
-                  <TableHead className="py-2.5 text-xs font-semibold">Student</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Submission</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Completion</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Tags</TableHead>
-                  <TableHead className="py-2.5 text-xs font-semibold">Remarks</TableHead>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Submission</TableHead>
+                  <TableHead>Completion</TableHead>
+                  <TableHead>Tags</TableHead>
+                  <TableHead>Remarks</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {check.studentRecords.map((record) => (
-                  <TableRow key={record.id} className="hover:bg-neutral-50/40">
-                    <TableCell className="font-semibold text-sm py-2.5">
-                      {record.student.rollNumber}. {record.student.name}
+                  <TableRow key={record.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-mono font-medium text-muted-foreground/60 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-md min-w-[24px] text-center">
+                          {record.student.rollNumber}
+                        </span>
+                        <span className="font-medium text-foreground text-sm">
+                          {record.student.name}
+                        </span>
+                      </div>
                     </TableCell>
-                    <TableCell className="py-2.5">
+                    <TableCell>
                       <SubmissionStatusBadge status={record.submissionStatus} />
                     </TableCell>
-                    <TableCell className="py-2.5">
+                    <TableCell>
                       {record.completionStatus ? (
                         <CompletionStatusBadge status={record.completionStatus} />
                       ) : (
-                        <span className="text-xs font-semibold text-muted-foreground bg-gray-50 border border-gray-200/50 px-1.5 py-0.5 rounded">N/A</span>
+                        <span className="text-[11px] font-semibold text-muted-foreground/50 bg-neutral-50 dark:bg-neutral-800/40 border border-border/30 px-1.5 py-0.5 rounded">N/A</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground py-2.5">
+                    <TableCell className="text-xs text-muted-foreground/90">
                       {record.remarkTags.join(", ") || "—"}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground py-2.5 font-sans">
+                    <TableCell className="text-xs text-muted-foreground/80 font-sans">
                       {record.remarks || "—"}
                     </TableCell>
                   </TableRow>

@@ -17,7 +17,7 @@ export default async function ClassDetailPage({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         breadcrumbs={[{ label: "Classes", href: "/classes" }, { label: classItem.name }]}
         emoji="🏫"

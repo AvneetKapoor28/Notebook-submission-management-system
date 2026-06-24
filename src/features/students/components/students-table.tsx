@@ -20,13 +20,17 @@ const columnHelper = createColumnHelper<StudentRow>();
 const columns: ColumnDef<StudentRow, any>[] = [
   columnHelper.accessor("rollNumber", {
     header: "Roll",
-    cell: (info) => <span className="font-medium text-xs md:text-sm">{info.getValue()}</span>,
+    cell: (info) => (
+      <span className="text-[11px] font-mono font-medium text-muted-foreground/60 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-md min-w-[24px] inline-block text-center shadow-sm shadow-black/[0.01]">
+        {info.getValue()}
+      </span>
+    ),
   }),
   columnHelper.accessor("name", {
     header: "Name",
     cell: (info) => (
       <Link
-        className="font-medium text-foreground hover:text-primary transition-colors text-xs md:text-sm"
+        className="font-semibold text-foreground hover:text-primary hover:underline transition-all text-xs md:text-sm"
         href={`/students/${info.row.original.id}`}
       >
         {info.getValue()}

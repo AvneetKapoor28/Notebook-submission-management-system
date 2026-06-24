@@ -170,7 +170,7 @@ export function AppShell({
       {/* Main Workspace Pane */}
       <div className="flex flex-1 flex-col overflow-hidden min-h-screen">
         {/* Dynamic page contents */}
-        <main className="flex-1 overflow-y-auto px-4 py-8 md:px-8 lg:px-12 xl:px-16 mt-12 lg:mt-0">
+        <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 lg:px-12 xl:px-14 mt-12 lg:mt-0">
           <div className="mx-auto max-w-5xl">
             {children}
           </div>

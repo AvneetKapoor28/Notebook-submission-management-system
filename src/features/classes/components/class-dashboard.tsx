@@ -94,15 +94,10 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
       {/* Tab Contents */}
       {activeTab === "topics" ? (
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight text-foreground font-heading">
-                Topics Database
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Track notebook check history, rate of completion, and student engagement per lesson.
-              </p>
-            </div>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-xs text-muted-foreground font-medium">
+              {classItem.topics.length} lesson {classItem.topics.length === 1 ? "topic" : "topics"}
+            </span>
             <Button
               onClick={() => setShowTopicForm((prev) => !prev)}
               variant={showTopicForm ? "secondary" : "default"}
@@ -216,15 +211,10 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
         </div>
       ) : (
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight text-foreground font-heading">
-                Students Roster
-              </h2>
-              <p className="text-xs text-muted-foreground">
-                Consolidated stats and management for roster students. Mark active/inactive to save check records.
-              </p>
-            </div>
+          <div className="flex items-center justify-between py-1">
+            <span className="text-xs text-muted-foreground font-medium">
+              {classItem.students.length} {classItem.students.length === 1 ? "student" : "students"} rostered
+            </span>
             <Button
               onClick={() => setShowStudentForm((prev) => !prev)}
               variant={showStudentForm ? "secondary" : "default"}

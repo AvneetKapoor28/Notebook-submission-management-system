@@ -6,7 +6,7 @@ export default async function AnalyticsPage() {
   const data = await getAnalyticsData();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
+    <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
         breadcrumbs={[{ label: "Analytics" }, { label: "Outcome trends" }]}
         emoji="📊"
