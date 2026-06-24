@@ -43,7 +43,7 @@ export function CreateClassDialog() {
                 Set up a new class workspace
               </h2>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Create a teaching group, set the academic year, and initialize your student roster.
+                Create a teaching group and initialize your student roster.
               </p>
             </div>
 

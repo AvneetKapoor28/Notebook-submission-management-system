@@ -20,7 +20,6 @@ export async function createClassAction(values: ClassFormValues) {
   await db.insert(schema.classes).values({
     teacherId: teacher.id,
     name: parsed.data.name,
-    academicYear: parsed.data.academicYear,
   });
 
   revalidatePath("/classes");

@@ -35,7 +35,6 @@ export function ClassForm({
     resolver: zodResolver(classFormSchema),
     defaultValues: {
       name: "",
-      academicYear: "2026-2027",
     },
   });
 
@@ -49,7 +48,7 @@ export function ClassForm({
       }
 
       toast.success(result.message);
-      reset({ name: "", academicYear: values.academicYear });
+      reset({ name: "" });
       onSuccess?.();
       router.refresh();
     });
@@ -57,20 +56,11 @@ export function ClassForm({
 
   if (layout === "grid") {
     return (
-      <form className="grid gap-4 sm:grid-cols-3" onSubmit={onSubmit}>
+      <form className="grid gap-4 sm:grid-cols-[2fr_1fr]" onSubmit={onSubmit}>
         <div className="space-y-2">
           <Label htmlFor="class-name">Class name</Label>
           <Input id="class-name" placeholder="Grade 8 - A" {...register("name")} />
           <FormMessage message={errors.name?.message} />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="academic-year">Academic year</Label>
-          <Input
-            id="academic-year"
-            placeholder="2026-2027"
-            {...register("academicYear")}
-          />
-          <FormMessage message={errors.academicYear?.message} />
         </div>
         <div className="flex items-end">
           <Button className="w-full" disabled={isPending} type="submit">
@@ -87,15 +77,6 @@ export function ClassForm({
         <Label htmlFor="class-name">Class name</Label>
         <Input id="class-name" placeholder="Grade 8 - A" {...register("name")} />
         <FormMessage message={errors.name?.message} />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="academic-year">Academic year</Label>
-        <Input
-          id="academic-year"
-          placeholder="2026-2027"
-          {...register("academicYear")}
-        />
-        <FormMessage message={errors.academicYear?.message} />
       </div>
       <div className="pt-2">
         <Button className="w-full" disabled={isPending} type="submit">

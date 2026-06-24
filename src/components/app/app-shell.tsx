@@ -19,7 +19,6 @@ import { cn } from "@/lib/utils";
 type ClassItem = {
   id: string;
   name: string;
-  academicYear: string;
   studentCount: number;
   activeStudentCount: number;
   topicCount: number;

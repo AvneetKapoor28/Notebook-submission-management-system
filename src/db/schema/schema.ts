@@ -48,17 +48,15 @@ export const classes = pgTable(
       .notNull()
       .references(() => teachers.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
-    academicYear: text("academic_year").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
     index("classes_teacher_idx").on(table.teacherId),
-    uniqueIndex("classes_teacher_name_year_idx").on(
+    uniqueIndex("classes_teacher_name_idx").on(
       table.teacherId,
       table.name,
-      table.academicYear,
     ),
   ],
 );

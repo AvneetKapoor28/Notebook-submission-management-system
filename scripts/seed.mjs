@@ -52,7 +52,6 @@ const teacher = {
 const classConfigs = [
   {
     name: "Grade 6 - A",
-    academicYear: "2026-2027",
     size: 32,
     topics: [
       ["Chapter 1", "Plant Cell", "2026-06-05"],
@@ -63,7 +62,6 @@ const classConfigs = [
   },
   {
     name: "Grade 7 - B",
-    academicYear: "2026-2027",
     size: 36,
     topics: [
       ["Chapter 3", "Heat Transfer", "2026-06-04"],
@@ -74,7 +72,6 @@ const classConfigs = [
   },
   {
     name: "Grade 8 - A",
-    academicYear: "2026-2027",
     size: 38,
     topics: [
       ["Chapter 5", "Force and Pressure", "2026-06-03"],
@@ -239,8 +236,8 @@ async function seed() {
       const classId = randomUUID();
 
       await tx`
-        insert into classes (id, teacher_id, name, academic_year)
-        values (${classId}, ${teacher.id}, ${classConfig.name}, ${classConfig.academicYear})
+        insert into classes (id, teacher_id, name)
+        values (${classId}, ${teacher.id}, ${classConfig.name})
       `;
 
       const students = Array.from({ length: classConfig.size }, (_, index) => ({

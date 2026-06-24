@@ -42,7 +42,6 @@ type StudentItem = {
 type ClassItem = {
   id: string;
   name: string;
-  academicYear: string;
   students: StudentItem[];
   activeStudents: StudentItem[];
   inactiveStudents: StudentItem[];

@@ -22,7 +22,7 @@ export default async function ClassDetailPage({
         breadcrumbs={[{ label: "Classes", href: "/classes" }, { label: classItem.name }]}
         emoji="🏫"
         title={classItem.name}
-        description={`Academic year ${classItem.academicYear}. Manage the roster, create topics, and start checks without leaving the workflow.`}
+        description="Manage the roster, create topics, and start checks without leaving the workflow."
       />
 
       <ClassDashboard classItem={classItem} />
