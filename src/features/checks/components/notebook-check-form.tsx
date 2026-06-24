@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { Search, X } from "lucide-react";
+import { Search, X, StickyNote, Trash2 } from "lucide-react";
 import {
   Fragment,
   useEffect,
@@ -215,6 +215,7 @@ export function NotebookCheckForm({
       : [...currentTags, tag];
 
     setValue(`records.${index}.remarkTags`, nextTags, { shouldDirty: true });
+    persistDraft();
   }
 
   function markAllSubmitted() {
@@ -475,7 +476,7 @@ export function NotebookCheckForm({
                             const isSelected = row?.completionStatus === status;
                             
                             // Map schema codes to shorter user-friendly labels to fit beautifully
-                            let label = COMPLETION_STATUS_LABELS[status];
+                            const label = COMPLETION_STATUS_LABELS[status];
 
                             let activeClass = "";
                             if (isSelected) {
@@ -515,30 +516,57 @@ export function NotebookCheckForm({
                       
                       <td className="px-4 py-3 align-middle">
                         <div className="flex flex-col gap-1 items-start">
-                          <button
-                            onClick={() => toggleExpandedRow(index)}
-                            type="button"
-                            className={cn(
-                              "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-md border border-border bg-neutral-50/50 hover:bg-neutral-100 dark:bg-neutral-900/30 dark:hover:bg-neutral-800 text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-none"
-                            )}
-                          >
-                            <span>📝</span>
-                            <span>{isExpanded ? "Hide" : "Notes"}</span>
-                          </button>
+                          {(() => {
+                            const tagsCount = row?.remarkTags?.length ?? 0;
+                            const hasRemarks = !!row?.remarks?.trim();
+                            const totalNotesCount = tagsCount + (hasRemarks ? 1 : 0);
+                            
+                            let btnClass = "";
+                            let iconColor = "";
+                            if (isExpanded) {
+                              btnClass = "bg-neutral-900 border-neutral-950 text-white hover:bg-neutral-800 dark:bg-neutral-100 dark:border-neutral-200 dark:text-neutral-900 dark:hover:bg-neutral-200 shadow-sm";
+                              iconColor = "text-current";
+                            } else if (totalNotesCount > 0) {
+                              btnClass = "bg-indigo-50/80 border-indigo-200/80 text-indigo-700 hover:bg-indigo-100/90 dark:bg-indigo-950/30 dark:border-indigo-900/50 dark:text-indigo-300 dark:hover:bg-indigo-950/60 font-semibold shadow-2xs";
+                              iconColor = "text-indigo-600 dark:text-indigo-400";
+                            } else {
+                              btnClass = "border-dashed border-neutral-300 bg-transparent text-muted-foreground/90 hover:text-foreground hover:bg-neutral-50 dark:border-neutral-800 dark:hover:bg-neutral-900 shadow-none";
+                              iconColor = "text-muted-foreground/60 group-hover:text-muted-foreground";
+                            }
+
+                            return (
+                              <button
+                                onClick={() => toggleExpandedRow(index)}
+                                type="button"
+                                className={cn(
+                                  "group inline-flex items-center gap-1.5 px-2 py-1 text-[11px] rounded-lg border transition-all cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
+                                  btnClass
+                                )}
+                              >
+                                <StickyNote className={cn("h-3.5 w-3.5", iconColor)} />
+                                <span>{isExpanded ? "Hide" : totalNotesCount > 0 ? "Notes" : "Add Note"}</span>
+                                {totalNotesCount > 0 && !isExpanded && (
+                                  <span className="inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[9px] font-bold text-white dark:bg-indigo-400 dark:text-indigo-950 leading-none">
+                                    {totalNotesCount}
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })()}
                           
-                          {/* Tags/Remarks Summary */}
-                          {(row?.remarkTags && row.remarkTags.length > 0) || row?.remarks ? (
-                            <div className="flex flex-wrap gap-1 max-w-[150px] mt-0.5">
+                          {/* Tags/Remarks Summary (only visible when collapsed) */}
+                          {!isExpanded && ((row?.remarkTags && row.remarkTags.length > 0) || row?.remarks) ? (
+                            <div className="flex flex-wrap gap-1 max-w-[150px] mt-1.5 animate-in fade-in duration-200">
                               {row.remarkTags?.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="inline-flex items-center px-1 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 text-neutral-600 dark:bg-neutral-850 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-800/50"
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200/40 dark:border-neutral-800/40"
                                 >
                                   {tag}
                                 </span>
                               ))}
                               {row.remarks && (
-                                <span className="inline-flex items-center px-1 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/30 dark:border-amber-900/30 max-w-[100px] truncate">
+                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/20 dark:border-amber-905/20 max-w-[100px] truncate">
                                   {row.remarks}
                                 </span>
                               )}
@@ -549,47 +577,102 @@ export function NotebookCheckForm({
                     </tr>
                     
                     {isExpanded ? (
-                      <tr className="border-t border-b border-border/30 bg-neutral-50/30 dark:bg-neutral-900/20">
+                      <tr className="border-t border-b border-border/30 bg-neutral-50/10 dark:bg-neutral-900/10">
                         <td className="px-4 py-4" colSpan={4}>
-                          <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
-                            <div className="space-y-2">
-                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick Tags</p>
-                              <div className="flex flex-wrap gap-1.5">
-                                {REMARK_TAGS.map((tag) => {
-                                  const selected = row?.remarkTags.includes(tag);
-
-                                  return (
-                                    <button
-                                      key={tag}
-                                      onClick={() => toggleTag(index, tag)}
-                                      type="button"
-                                      className={cn(
-                                        "px-2.5 py-1 text-xs font-semibold rounded-md border transition-all cursor-pointer select-none",
-                                        selected
-                                          ? "bg-neutral-900 border-neutral-950 text-white dark:bg-neutral-100 dark:border-neutral-200 dark:text-neutral-900"
-                                          : "bg-transparent border-neutral-200 text-muted-foreground hover:text-foreground dark:border-neutral-800 dark:hover:bg-neutral-850"
-                                      )}
-                                    >
-                                      {tag}
-                                    </button>
-                                  );
-                                })}
+                          <div className="rounded-xl border border-neutral-200/50 bg-neutral-50/50 p-4 dark:border-neutral-800/40 dark:bg-neutral-900/30 shadow-inner space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                            {/* Card Header */}
+                            <div className="flex items-center justify-between border-b border-neutral-200/40 pb-2 dark:border-neutral-800/40">
+                              <div className="flex items-center gap-2">
+                                <div className="p-1 rounded-md bg-indigo-50 dark:bg-indigo-950/40">
+                                  <StickyNote className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                                <h4 className="text-xs font-bold text-neutral-800 dark:text-neutral-200">
+                                  Notes &amp; Remarks for <span className="text-indigo-600 dark:text-indigo-400">{student.name}</span>
+                                </h4>
                               </div>
+                              
+                              {/* Clear Action */}
+                              {((row?.remarkTags && row.remarkTags.length > 0) || row?.remarks) ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setValue(`records.${index}.remarkTags`, [], { shouldDirty: true });
+                                    setValue(`records.${index}.remarks`, null, { shouldDirty: true });
+                                    persistDraft();
+                                  }}
+                                  className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-bold text-rose-600 dark:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-md transition-all cursor-pointer"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                  Clear Notes
+                                </button>
+                              ) : null}
                             </div>
-                            <div className="space-y-2">
-                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Custom Remark</label>
-                              <Textarea
-                                className="min-h-16 text-xs bg-card border-border/80 focus-visible:ring-1 focus-visible:ring-ring/50"
-                                placeholder="Optional note for this student"
-                                value={row?.remarks ?? ""}
-                                onChange={(event) =>
-                                  setValue(
-                                    `records.${index}.remarks`,
-                                    event.target.value || null,
-                                    { shouldDirty: true },
-                                  )
-                                }
-                              />
+
+                            <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                              {/* Left column: Quick Tags */}
+                              <div className="space-y-2">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick Tags</p>
+                                <div className="flex flex-wrap gap-2">
+                                  {REMARK_TAGS.map((tag) => {
+                                    const selected = row?.remarkTags.includes(tag);
+
+                                    // Define tag-specific colors when selected
+                                    let tagStyles = "";
+                                    if (selected) {
+                                      if (tag === "Diagram Missing") {
+                                        tagStyles = "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-950/30 dark:border-rose-900/50 dark:text-rose-300";
+                                      } else if (tag === "Homework Incomplete") {
+                                        tagStyles = "bg-orange-50 border-orange-200 text-orange-700 dark:bg-orange-950/30 dark:border-orange-900/50 dark:text-orange-300";
+                                      } else if (tag === "Corrections Pending") {
+                                        tagStyles = "bg-sky-50 border-sky-200 text-sky-700 dark:bg-sky-950/30 dark:border-sky-900/50 dark:text-sky-300";
+                                      } else if (tag === "Notebook Not Brought") {
+                                        tagStyles = "bg-purple-50 border-purple-200 text-purple-700 dark:bg-purple-950/30 dark:border-purple-900/50 dark:text-purple-300";
+                                      } else if (tag === "Untidy Work") {
+                                        tagStyles = "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-950/30 dark:border-amber-900/50 dark:text-amber-300";
+                                      } else {
+                                        tagStyles = "bg-neutral-900 border-neutral-950 text-white dark:bg-neutral-100 dark:border-neutral-200 dark:text-neutral-900";
+                                      }
+                                    } else {
+                                      tagStyles = "bg-transparent border-neutral-200 text-muted-foreground hover:text-foreground hover:bg-neutral-100/50 dark:border-neutral-850/80 dark:hover:bg-neutral-850/50";
+                                    }
+
+                                    return (
+                                      <button
+                                        key={tag}
+                                        onClick={() => toggleTag(index, tag)}
+                                        type="button"
+                                        className={cn(
+                                          "px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all cursor-pointer select-none",
+                                          tagStyles
+                                        )}
+                                      >
+                                        {tag}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+
+                              {/* Right column: Custom Remarks */}
+                              <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Custom Remark</label>
+                                <Textarea
+                                  className="min-h-20 text-xs bg-card border-border/80 focus-visible:ring-1 focus-visible:ring-ring/50 rounded-lg resize-y placeholder:text-muted-foreground/60"
+                                  placeholder="Type any optional details/notes for this student..."
+                                  value={row?.remarks ?? ""}
+                                  onChange={(event) => {
+                                    setValue(
+                                      `records.${index}.remarks`,
+                                      event.target.value || null,
+                                      { shouldDirty: true },
+                                    );
+                                    persistDraft();
+                                  }}
+                                />
+                                <span className="block text-[9px] text-muted-foreground/60 italic leading-none pl-0.5">
+                                  Remarks are automatically autosaved to draft.
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </td>
