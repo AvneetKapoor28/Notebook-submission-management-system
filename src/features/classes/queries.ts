@@ -69,6 +69,9 @@ export async function getClassDetail(classId: string) {
     with: {
       students: {
         orderBy: (table, { asc }) => [asc(table.rollNumber)],
+        with: {
+          checkRecords: true,
+        },
       },
       topics: {
         orderBy: (table, { desc: orderDesc }) => [orderDesc(table.dateTaught)],
@@ -100,10 +103,35 @@ export async function getClassDetail(classId: string) {
     };
   });
 
+  const students = classItem.students.map((student) => {
+    const missedSubmissionsCount = student.checkRecords.filter(
+      (r) =>
+        r.submissionStatus === "NOT_SUBMITTED" ||
+        r.submissionStatus === "ABSENT",
+    ).length;
+
+    const incompleteSubmissionsCount = student.checkRecords.filter(
+      (r) =>
+        r.completionStatus === "INCOMPLETE" ||
+        r.completionStatus === "NOT_DONE" ||
+        r.completionStatus === "NEEDS_CORRECTION",
+    ).length;
+
+    return {
+      id: student.id,
+      rollNumber: student.rollNumber,
+      name: student.name,
+      isActive: student.isActive,
+      missedSubmissionsCount,
+      incompleteSubmissionsCount,
+    };
+  });
+
   return {
     ...classItem,
-    activeStudents: classItem.students.filter((student) => student.isActive),
-    inactiveStudents: classItem.students.filter((student) => !student.isActive),
+    students,
+    activeStudents: students.filter((student) => student.isActive),
+    inactiveStudents: students.filter((student) => !student.isActive),
     topics,
   };
 }

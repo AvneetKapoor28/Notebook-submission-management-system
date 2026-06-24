@@ -16,12 +16,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import { cn } from "@/lib/utils";
+
 export function DataTable<TData>({
   columns,
   data,
+  maxHeightClass,
 }: {
   columns: Array<ColumnDef<TData, any>>;
   data: TData[];
+  maxHeightClass?: string;
 }) {
   const table = useReactTable({
     columns,
@@ -31,11 +35,11 @@ export function DataTable<TData>({
 
   return (
     <div className="overflow-hidden rounded-3xl border border-border/70 bg-white/90">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
+      <div className={cn("overflow-x-auto", maxHeightClass)}>
+        <Table className="relative border-collapse">
+          <TableHeader className={cn(maxHeightClass && "sticky top-0 bg-white z-10 shadow-[0_1px_0_0_rgba(0,0,0,0.05)]")}>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder
