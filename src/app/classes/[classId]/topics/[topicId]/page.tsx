@@ -133,14 +133,14 @@ export default async function TopicDetailPage({
               </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
+              <div className="overflow-auto custom-scrollbar max-h-[calc(100vh-360px)] min-h-[350px]">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="sticky top-0 bg-neutral-50/95 dark:bg-neutral-900/95 z-10 backdrop-blur-xs border-b border-border">
                     <TableRow>
-                      <TableHead>Student</TableHead>
-                      <TableHead>Submission</TableHead>
-                      <TableHead>Completion</TableHead>
-                      <TableHead>Remarks & Tags</TableHead>
+                      <TableHead className="w-[25%] min-w-[180px]">Student</TableHead>
+                      <TableHead className="w-[20%] min-w-[140px]">Submission</TableHead>
+                      <TableHead className="w-[20%] min-w-[140px]">Completion</TableHead>
+                      <TableHead className="w-[35%] min-w-[200px]">Remarks & Tags</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -150,13 +150,13 @@ export default async function TopicDetailPage({
                           left.student.rollNumber - right.student.rollNumber,
                       )
                       .map((record) => (
-                        <TableRow key={record.id}>
+                        <TableRow key={record.id} className="align-middle">
                           <TableCell>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[11px] font-mono font-medium text-muted-foreground/60 bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded-md min-w-[24px] text-center">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="neutral" className="shrink-0 w-8 h-5 justify-center font-mono text-[10px] shadow-none">
                                 {record.student.rollNumber}
-                              </span>
-                              <span className="font-medium text-foreground text-sm">
+                              </Badge>
+                              <span className="font-semibold text-foreground text-sm">
                                 {record.student.name}
                               </span>
                             </div>
@@ -176,21 +176,23 @@ export default async function TopicDetailPage({
                           <TableCell>
                             <div className="flex flex-wrap items-center gap-1.5">
                               {record.remarkTags.map((tag) => (
-                                <Badge
+                                <span
                                   key={tag}
-                                  variant="neutral"
-                                  className="text-[10px] px-1.5 py-0 bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300 font-normal border-none"
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 text-neutral-600 dark:bg-neutral-850 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-800/50"
                                 >
                                   {tag}
-                                </Badge>
+                                </span>
                               ))}
                               {record.remarks && (
-                                <span className="text-xs text-muted-foreground font-sans">
+                                <span 
+                                  className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/30 dark:border-amber-900/30 max-w-[250px] truncate"
+                                  title={record.remarks}
+                                >
                                   {record.remarks}
                                 </span>
                               )}
                               {!record.remarkTags.length && !record.remarks && (
-                                <span className="text-xs text-muted-foreground/45">—</span>
+                                <span className="text-xs text-muted-foreground/45 pl-1 italic">None</span>
                               )}
                             </div>
                           </TableCell>

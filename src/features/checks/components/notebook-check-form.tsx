@@ -21,7 +21,6 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createNotebookCheckAction,
@@ -100,7 +99,7 @@ export function NotebookCheckForm({
               studentId: student.id,
               submissionStatus: existingRecord?.submissionStatus ?? "SUBMITTED",
               completionStatus: existingRecord ? existingRecord.completionStatus : "COMPLETE",
-              remarkTags: (existingRecord?.remarkTags ?? []) as any,
+              remarkTags: (existingRecord?.remarkTags ?? []) as (typeof REMARK_TAGS)[number][],
               remarks: existingRecord?.remarks ?? null,
             };
           }),
@@ -363,11 +362,11 @@ export function NotebookCheckForm({
   return (
     <div className="space-y-4" onKeyDown={handleKeyboardShortcuts}>
       {draftCandidate ? (
-        <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/50 dark:bg-amber-950/20 dark:border-amber-900/50 px-4 py-3 text-sm text-amber-800 dark:text-amber-300">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="font-medium">Recovered an unsent draft for this topic.</p>
-              <p className="text-amber-700">
+              <p className="text-amber-700/80 dark:text-amber-400/80 text-xs">
                 Last saved at {new Date(draftCandidate.updatedAt).toLocaleTimeString()}.
               </p>
             </div>
@@ -383,40 +382,57 @@ export function NotebookCheckForm({
         </div>
       ) : null}
 
-      <div className="grid gap-4 rounded-lg border border-border/70 bg-neutral-50/10 p-4 lg:grid-cols-[1fr_auto]">
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider" htmlFor="check-date">
+      {/* Control / Filter Bar */}
+      <div className="flex flex-col gap-4 rounded-xl border border-border bg-neutral-50/30 dark:bg-neutral-900/10 p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="space-y-1">
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider" htmlFor="check-date">
               Check date
             </label>
-            <Input id="check-date" type="date" {...form.register("checkDate")} />
+            <Input id="check-date" type="date" className="h-8 text-xs w-[140px] px-2 py-1 shadow-none" {...form.register("checkDate")} />
+          </div>
+          
+          {/* Keyboard Shortcuts Legend (Only visible on screens with enough width) */}
+          <div className="hidden lg:flex flex-col justify-center h-10 pl-4 border-l border-border/60">
+            <span className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider mb-1 flex items-center gap-1">
+              <span>⌨️</span> Keyboard Shortcuts
+            </span>
+            <div className="flex items-center gap-x-3 text-[11px] text-muted-foreground">
+              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">↑/↓</kbd> Navigate</div>
+              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">1-5</kbd> Submission</div>
+              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">Q-R</kbd> Completion</div>
+              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">Enter</kbd> Notes</div>
+              <div><kbd className="px-1 py-0.5 text-[9px] font-mono bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded text-foreground/80">⌘+S</kbd> Submit</div>
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-end gap-2 lg:justify-end">
-          <Button onClick={markAllSubmitted} type="button" variant="outline" size="sm" className="text-xs">
+        
+        <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={markAllSubmitted} type="button" variant="outline" size="sm" className="text-xs h-8">
             Mark all submitted
           </Button>
-          <Button onClick={markAllComplete} type="button" variant="outline" size="sm" className="text-xs">
+          <Button onClick={markAllComplete} type="button" variant="outline" size="sm" className="text-xs h-8">
             Mark all complete
           </Button>
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border/80 bg-card shadow-sm">
-        <div className="overflow-x-auto">
+      {/* Table Container */}
+      <div className="overflow-hidden rounded-xl border border-border bg-card shadow-xs">
+        <div className="overflow-auto custom-scrollbar max-h-[calc(100vh-325px)] min-h-[350px]">
           <table className="min-w-full border-collapse">
-            <thead className="bg-neutral-50/50 border-b border-border/40">
+            <thead className="sticky top-0 bg-neutral-50/95 dark:bg-neutral-900/95 backdrop-blur-xs border-b border-border z-10">
               <tr>
-                <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                <th className="w-[25%] min-w-[180px] px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                   Student
                 </th>
-                <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                <th className="w-[40%] min-w-[340px] px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                   Submission Status
                 </th>
-                <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                <th className="w-[25%] min-w-[280px] px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                   Completion Status
                 </th>
-                <th className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                <th className="w-[10%] min-w-[120px] px-4 py-3 text-left text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
                   Remarks
                 </th>
               </tr>
@@ -435,138 +451,186 @@ export function NotebookCheckForm({
                         rowRefs.current[index] = element;
                       }}
                       className={cn(
-                        "border-t border-border/40 align-top transition-colors hover:bg-neutral-50/20",
-                        isActive && "bg-amber-50/30 font-medium",
+                        "border-t border-border/40 align-middle transition-colors hover:bg-neutral-50/30 dark:hover:bg-neutral-900/20",
+                        isActive && "bg-amber-500/[0.02] dark:bg-amber-500/[0.01]",
                       )}
                       onClick={() => setActiveRow(index)}
                       tabIndex={0}
                     >
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 relative">
+                        {isActive && (
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-500 rounded-r" />
+                        )}
                         <div className="flex items-center gap-3">
-                          <Badge variant={isActive ? "yellow" : "neutral"} className="shrink-0">
+                          <Badge variant={isActive ? "yellow" : "neutral"} className="shrink-0 w-8 h-5 justify-center font-mono text-[10px] shadow-none">
                             {students[index].rollNumber}
                           </Badge>
                           <div className="truncate">
                             <p className="font-semibold text-sm text-foreground leading-tight">
                               {students[index].name}
                             </p>
-                            <p className="text-[10px] text-muted-foreground/75 mt-1 select-none">
-                              Shortcuts: 1-5, QWER, Enter
-                            </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1.5">
+                      
+                      <td className="px-4 py-3 align-middle">
+                        <div className="inline-flex w-full max-w-[340px] items-center rounded-lg bg-neutral-100/60 p-0.5 border border-neutral-200/40 dark:bg-neutral-900/60 dark:border-neutral-800/40">
                           {SUBMISSION_STATUSES.map((status) => {
                             const isSelected = row?.submissionStatus === status;
+                            
+                            // Map schema codes to shorter user-friendly labels to fit beautifully
+                            let label = SUBMISSION_STATUS_LABELS[status];
+                            if (status === "NOT_SUBMITTED") label = "Missing";
+                            if (status === "LATE_SUBMISSION") label = "Late";
+
                             let activeClass = "";
                             if (isSelected) {
-                              if (status === "SUBMITTED") activeClass = "bg-green-50 text-green-800 border-green-200/60 hover:bg-green-100/40";
-                              else if (status === "NOT_SUBMITTED") activeClass = "bg-rose-50 text-rose-800 border-rose-200/60 hover:bg-rose-100/40";
-                              else if (status === "LATE_SUBMISSION") activeClass = "bg-amber-50 text-amber-800 border-amber-200/60 hover:bg-amber-100/40";
-                              else if (status === "EXCUSED") activeClass = "bg-sky-50 text-sky-800 border-sky-200/60 hover:bg-sky-100/40";
-                              else if (status === "ABSENT") activeClass = "bg-neutral-100 text-neutral-800 border-neutral-200 hover:bg-neutral-200/40";
+                              if (status === "SUBMITTED") {
+                                activeClass = "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-500/20 shadow-xs font-semibold";
+                              } else if (status === "NOT_SUBMITTED") {
+                                activeClass = "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 border-rose-500/20 shadow-xs font-semibold";
+                              } else if (status === "LATE_SUBMISSION") {
+                                activeClass = "bg-amber-500/10 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 border-amber-500/20 shadow-xs font-semibold";
+                              } else if (status === "EXCUSED") {
+                                activeClass = "bg-sky-500/10 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300 border-sky-500/20 shadow-xs font-semibold";
+                              } else if (status === "ABSENT") {
+                                activeClass = "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 shadow-xs font-semibold border-neutral-300/40 dark:border-neutral-600/40";
+                              }
                             } else {
-                              activeClass = "border-border/50 bg-transparent text-muted-foreground hover:bg-neutral-50/50 hover:text-foreground";
+                              activeClass = "text-muted-foreground hover:text-foreground border-transparent bg-transparent";
                             }
 
                             return (
-                              <Button
+                              <button
                                 key={status}
-                                className={cn("min-w-24 text-xs font-semibold rounded shadow-none border h-7 px-2", activeClass)}
+                                className={cn(
+                                  "flex-1 py-1 px-1.5 text-[11px] font-medium transition-all text-center rounded-md border border-transparent select-none cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50",
+                                  activeClass
+                                )}
                                 onClick={() => setSubmissionStatus(index, status)}
-                                size="sm"
                                 type="button"
                               >
-                                {SUBMISSION_STATUS_LABELS[status]}
-                              </Button>
+                                {label}
+                              </button>
                             );
                           })}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap gap-1.5">
+                      
+                      <td className="px-4 py-3 align-middle">
+                        <div className="inline-flex w-full max-w-[280px] items-center rounded-lg bg-neutral-100/60 p-0.5 border border-neutral-200/40 dark:bg-neutral-900/60 dark:border-neutral-800/40">
                           {COMPLETION_STATUSES.map((status) => {
                             const isSelected = row?.completionStatus === status;
+                            
+                            // Map schema codes to shorter user-friendly labels to fit beautifully
+                            let label = COMPLETION_STATUS_LABELS[status];
+                            if (status === "NEEDS_CORRECTION") label = "Correction";
+
                             let activeClass = "";
                             if (isSelected) {
-                              if (status === "COMPLETE") activeClass = "bg-green-50 text-green-800 border-green-200/60 hover:bg-green-100/40";
-                              else if (status === "INCOMPLETE") activeClass = "bg-orange-50 text-orange-800 border-orange-200/60 hover:bg-orange-100/40";
-                              else if (status === "NOT_DONE") activeClass = "bg-rose-50 text-rose-800 border-rose-200/60 hover:bg-rose-100/40";
-                              else if (status === "NEEDS_CORRECTION") activeClass = "bg-blue-50 text-blue-800 border-blue-200/60 hover:bg-blue-100/40";
+                              if (status === "COMPLETE") {
+                                activeClass = "bg-emerald-500/10 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300 border-emerald-500/20 shadow-xs font-semibold";
+                              } else if (status === "INCOMPLETE") {
+                                activeClass = "bg-orange-500/10 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300 border-orange-500/20 shadow-xs font-semibold";
+                              } else if (status === "NOT_DONE") {
+                                activeClass = "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 border-rose-500/20 shadow-xs font-semibold";
+                              } else if (status === "NEEDS_CORRECTION") {
+                                activeClass = "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border-indigo-500/20 shadow-xs font-semibold";
+                              }
                             } else {
-                              activeClass = "border-border/50 bg-transparent text-muted-foreground hover:bg-neutral-50/50 hover:text-foreground";
+                              activeClass = "text-muted-foreground hover:text-foreground border-transparent bg-transparent disabled:opacity-40";
                             }
 
                             return (
-                              <Button
+                              <button
                                 key={status}
-                                className={cn("min-w-24 text-xs font-semibold rounded shadow-none border h-7 px-2", activeClass)}
+                                className={cn(
+                                  "flex-1 py-1 px-1.5 text-[11px] font-medium transition-all text-center rounded-md border border-transparent select-none cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-ring/50 disabled:cursor-not-allowed",
+                                  activeClass
+                                )}
                                 disabled={isAbsent}
                                 onClick={() => setCompletionStatus(index, status)}
-                                size="sm"
                                 type="button"
                               >
-                                {COMPLETION_STATUS_LABELS[status]}
-                              </Button>
+                                {label}
+                              </button>
                             );
                           })}
                         </div>
                         {isAbsent ? (
-                          <p className="mt-1 text-[10px] text-muted-foreground italic">
-                            Absent (Completion status disabled)
+                          <p className="mt-1 text-[9px] text-muted-foreground/75 italic leading-none pl-1">
+                            Absent (disabled)
                           </p>
                         ) : null}
                       </td>
-                      <td className="px-4 py-3">
-                        <Button
-                          onClick={() => toggleExpandedRow(index)}
-                          size="xs"
-                          type="button"
-                          variant="ghost"
-                          className="text-xs text-muted-foreground hover:text-foreground"
-                        >
-                          {isExpanded ? "Hide notes" : "Edit notes"}
-                        </Button>
-                        <p className="mt-1 text-[10px] text-muted-foreground pl-1.5">
-                          {row?.remarkTags.length
-                            ? `${row.remarkTags.length} tags`
-                            : row?.remarks
-                              ? "Custom remark"
-                              : "No remarks"}
-                        </p>
+                      
+                      <td className="px-4 py-3 align-middle">
+                        <div className="flex flex-col gap-1 items-start">
+                          <button
+                            onClick={() => toggleExpandedRow(index)}
+                            type="button"
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-semibold rounded-md border border-border bg-neutral-50/50 hover:bg-neutral-100 dark:bg-neutral-900/30 dark:hover:bg-neutral-800 text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-none"
+                            )}
+                          >
+                            <span>📝</span>
+                            <span>{isExpanded ? "Hide" : "Notes"}</span>
+                          </button>
+                          
+                          {/* Tags/Remarks Summary */}
+                          {(row?.remarkTags && row.remarkTags.length > 0) || row?.remarks ? (
+                            <div className="flex flex-wrap gap-1 max-w-[150px] mt-0.5">
+                              {row.remarkTags?.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="inline-flex items-center px-1 py-0.5 rounded text-[9px] font-semibold bg-neutral-100 text-neutral-600 dark:bg-neutral-850 dark:text-neutral-400 border border-neutral-200/50 dark:border-neutral-800/50"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                              {row.remarks && (
+                                <span className="inline-flex items-center px-1 py-0.5 rounded text-[9px] font-semibold bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/30 dark:border-amber-900/30 max-w-[100px] truncate">
+                                  {row.remarks}
+                                </span>
+                              )}
+                            </div>
+                          ) : null}
+                        </div>
                       </td>
                     </tr>
+                    
                     {isExpanded ? (
-                      <tr className="border-t border-dashed border-border/40 bg-neutral-50/15">
+                      <tr className="border-t border-b border-border/30 bg-neutral-50/30 dark:bg-neutral-900/20">
                         <td className="px-4 py-4" colSpan={4}>
                           <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
                             <div className="space-y-2">
-                              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quick Tags</p>
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Quick Tags</p>
                               <div className="flex flex-wrap gap-1.5">
                                 {REMARK_TAGS.map((tag) => {
                                   const selected = row?.remarkTags.includes(tag);
 
                                   return (
-                                    <Button
+                                    <button
                                       key={tag}
                                       onClick={() => toggleTag(index, tag)}
-                                      size="xs"
                                       type="button"
-                                      variant={selected ? "default" : "outline"}
-                                      className="text-xs rounded shadow-none"
+                                      className={cn(
+                                        "px-2.5 py-1 text-xs font-semibold rounded-md border transition-all cursor-pointer select-none",
+                                        selected
+                                          ? "bg-neutral-900 border-neutral-950 text-white dark:bg-neutral-100 dark:border-neutral-200 dark:text-neutral-900"
+                                          : "bg-transparent border-neutral-200 text-muted-foreground hover:text-foreground dark:border-neutral-800 dark:hover:bg-neutral-850"
+                                      )}
                                     >
                                       {tag}
-                                    </Button>
+                                    </button>
                                   );
                                 })}
                               </div>
                             </div>
                             <div className="space-y-2">
-                              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Custom Remark</label>
+                              <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Custom Remark</label>
                               <Textarea
-                                className="min-h-16 text-xs"
+                                className="min-h-16 text-xs bg-card border-border/80 focus-visible:ring-1 focus-visible:ring-ring/50"
                                 placeholder="Optional note for this student"
                                 value={row?.remarks ?? ""}
                                 onChange={(event) =>
@@ -590,12 +654,13 @@ export function NotebookCheckForm({
         </div>
       </div>
 
-      <div className="sticky bottom-4 z-10 rounded-lg border border-border bg-card/95 backdrop-blur-xs p-4 shadow-md animate-in fade-in duration-300">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-            <Badge variant="neutral" className="px-2 py-0.5">{students.length} students</Badge>
-            <Badge variant="neutral" className="px-2 py-0.5">{dirtyRows} changed</Badge>
-            <span className="flex items-center gap-1 select-none">
+      {/* Sticky Bottom Actions Bar */}
+      <div className="sticky bottom-4 z-10 rounded-xl border border-border bg-card/95 dark:bg-card/90 backdrop-blur-xs p-4 shadow-md animate-in fade-in duration-300">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+            <Badge variant="neutral" className="px-2 py-0.5 font-semibold">{students.length} students</Badge>
+            <Badge variant="neutral" className="px-2 py-0.5 font-semibold">{dirtyRows} changed</Badge>
+            <span className="flex items-center gap-1 select-none font-medium">
               ☁️{" "}
               {lastAutosavedAt
                 ? `Draft saved at ${new Date(lastAutosavedAt).toLocaleTimeString()}`
@@ -606,7 +671,7 @@ export function NotebookCheckForm({
             <Button onClick={persistDraft} type="button" variant="outline" size="sm" className="text-xs">
               Save draft now
             </Button>
-            <Button disabled={isPending} onClick={() => void onSubmit()} size="sm" className="text-xs">
+            <Button disabled={isPending} onClick={() => void onSubmit()} size="sm" className="text-xs font-semibold">
               {isPending
                 ? existingCheck
                   ? "Updating check..."
@@ -617,10 +682,10 @@ export function NotebookCheckForm({
             </Button>
           </div>
         </div>
+        {formState.errors.records?.root ? (
+          <p className="text-xs text-rose-600 font-semibold mt-2">{formState.errors.records.root.message}</p>
+        ) : null}
       </div>
-      {formState.errors.records?.root ? (
-        <p className="text-xs text-rose-600 font-semibold">{formState.errors.records.root.message}</p>
-      ) : null}
     </div>
   );
 }
