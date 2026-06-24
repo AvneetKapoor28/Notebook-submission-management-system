@@ -17,7 +17,6 @@ export type StudentAttentionSummary = {
   missingCount: number;
   lateCount: number;
   incompleteCount: number;
-  correctionCount: number;
   score: number;
   reasons: string[];
 };
@@ -36,7 +35,6 @@ export function summarizeAttentionRecords(records: AttentionRecord[]) {
         missingCount: 0,
         lateCount: 0,
         incompleteCount: 0,
-        correctionCount: 0,
         score: 0,
         reasons: [],
       } satisfies StudentAttentionSummary);
@@ -54,10 +52,6 @@ export function summarizeAttentionRecords(records: AttentionRecord[]) {
       record.completionStatus === "NOT_DONE"
     ) {
       existing.incompleteCount += 1;
-    }
-
-    if (record.completionStatus === "NEEDS_CORRECTION") {
-      existing.correctionCount += 1;
     }
 
     map.set(record.studentId, existing);
@@ -79,17 +73,12 @@ export function summarizeAttentionRecords(records: AttentionRecord[]) {
         reasons.push(`${summary.incompleteCount} incomplete checks`);
       }
 
-      if (summary.correctionCount >= DEFAULT_DEFAULTER_THRESHOLDS.corrections) {
-        reasons.push(`${summary.correctionCount} correction cases`);
-      }
-
       return {
         ...summary,
         score:
           summary.missingCount * 3 +
           summary.lateCount * 2 +
-          summary.incompleteCount * 2 +
-          summary.correctionCount * 2,
+          summary.incompleteCount * 2,
         reasons,
       };
     })

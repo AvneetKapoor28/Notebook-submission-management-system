@@ -47,9 +47,6 @@ export async function getStudentProfile(studentId: string) {
   const lateCount = timeline.filter(
     (record) => record.submissionStatus === "LATE_SUBMISSION",
   ).length;
-  const correctionCount = timeline.filter(
-    (record) => record.completionStatus === "NEEDS_CORRECTION",
-  ).length;
   const completionEligible = timeline.filter(
     (record) => record.completionStatus !== null,
   );
@@ -65,7 +62,6 @@ export async function getStudentProfile(studentId: string) {
       ? (completedCount / completionEligible.length) * 100
       : 0,
     lateCount,
-    correctionCount,
   };
 }
 

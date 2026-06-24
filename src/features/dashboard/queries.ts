@@ -46,12 +46,6 @@ export async function getDashboardData() {
     .sort((left, right) => right.checkDate.localeCompare(left.checkDate))
     .slice(0, 5);
 
-  const pendingCorrections = allChecks.filter((check) => {
-    return check.studentRecords.some(
-      (record) => record.completionStatus === "NEEDS_CORRECTION",
-    );
-  });
-
   const attentionRecords = allChecks.flatMap((check) =>
     check.studentRecords.map((record) => {
       const student = allStudents.find((item) => item.id === record.studentId);
@@ -84,14 +78,11 @@ export async function getDashboardData() {
     totalClasses: classes.length,
     totalStudents: allStudents.length,
     recentChecks,
-    pendingCorrections,
     attentionStudents: defaulters.slice(0, 5),
     lateSubmitters,
     defaulterSummary: {
       total: defaulters.length,
       missing: defaulters.filter((student) => student.missingCount > 0).length,
-      corrections: defaulters.filter((student) => student.correctionCount > 0)
-        .length,
     },
   };
 }

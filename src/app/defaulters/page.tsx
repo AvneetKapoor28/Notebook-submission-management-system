@@ -22,7 +22,7 @@ export default async function DefaultersPage({
         breadcrumbs={[{ label: "Attention Queue" }, { label: "Defaulters" }]}
         emoji="🚨"
         title="Defaulters"
-        description="Students crossing active thresholds for missing work, lateness, or correction-heavy history."
+        description="Students crossing active thresholds for missing work, lateness, or incomplete checks."
       />
       <Card className="shadow-none border-border/80 bg-card/40">
         <CardContent className="p-4">

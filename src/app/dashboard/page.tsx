@@ -64,7 +64,7 @@ export default async function DashboardPage() {
         <div className="space-y-1">
           <p className="font-semibold text-foreground">Active Workspace Summary</p>
           <p className="text-muted-foreground text-xs sm:text-sm leading-normal">
-            You have <strong className="text-foreground font-semibold">{data.totalClasses} active classes</strong> under management. Currently, <strong className="text-foreground font-semibold">{data.pendingCorrections.length} checks</strong> are waiting for corrections, and <strong className="text-foreground font-semibold">{data.defaulterSummary.total} students</strong> have crossed the default limits.
+            You have <strong className="text-foreground font-semibold">{data.totalClasses} active classes</strong> under management, and <strong className="text-foreground font-semibold">{data.defaulterSummary.total} students</strong> have crossed the default limits.
           </p>
         </div>
       </div>
@@ -249,19 +249,6 @@ export default async function DashboardPage() {
                 </div>
                 <div className="h-1 w-full rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
                   <div className="h-full bg-rose-500" style={{ width: `${data.totalStudents > 0 ? (data.defaulterSummary.missing / data.totalStudents) * 100 : 0}%` }} />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-muted-foreground font-medium flex items-center gap-1.5">
-                    <span className="size-1.5 rounded-full bg-amber-500" />
-                    Correction-heavy
-                  </span>
-                  <span className="font-semibold text-foreground">{data.defaulterSummary.corrections} students</span>
-                </div>
-                <div className="h-1 w-full rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
-                  <div className="h-full bg-amber-500" style={{ width: `${data.totalStudents > 0 ? (data.defaulterSummary.corrections / data.totalStudents) * 100 : 0}%` }} />
                 </div>
               </div>
 

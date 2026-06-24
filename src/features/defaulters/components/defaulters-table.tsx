@@ -14,7 +14,6 @@ type DefaulterRow = {
   missingCount: number;
   lateCount: number;
   incompleteCount: number;
-  correctionCount: number;
   reasons: string[];
 };
 
@@ -40,9 +39,6 @@ const columns: ColumnDef<DefaulterRow, any>[] = [
   }),
   columnHelper.accessor("lateCount", {
     header: "Late",
-  }),
-  columnHelper.accessor("correctionCount", {
-    header: "Corrections",
   }),
   columnHelper.accessor("reasons", {
     header: "Reasons",

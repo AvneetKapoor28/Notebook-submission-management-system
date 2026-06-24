@@ -491,8 +491,6 @@ export function NotebookCheckForm({
                                 activeClass = "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 border-rose-500/20 shadow-xs font-semibold";
                               } else if (status === "LATE_SUBMISSION") {
                                 activeClass = "bg-amber-500/10 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300 border-amber-500/20 shadow-xs font-semibold";
-                              } else if (status === "EXCUSED") {
-                                activeClass = "bg-sky-500/10 text-sky-700 dark:bg-sky-500/20 dark:text-sky-300 border-sky-500/20 shadow-xs font-semibold";
                               } else if (status === "ABSENT") {
                                 activeClass = "bg-neutral-200 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-200 shadow-xs font-semibold border-neutral-300/40 dark:border-neutral-600/40";
                               }
@@ -524,7 +522,6 @@ export function NotebookCheckForm({
                             
                             // Map schema codes to shorter user-friendly labels to fit beautifully
                             let label = COMPLETION_STATUS_LABELS[status];
-                            if (status === "NEEDS_CORRECTION") label = "Correction";
 
                             let activeClass = "";
                             if (isSelected) {
@@ -534,8 +531,6 @@ export function NotebookCheckForm({
                                 activeClass = "bg-orange-500/10 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300 border-orange-500/20 shadow-xs font-semibold";
                               } else if (status === "NOT_DONE") {
                                 activeClass = "bg-rose-500/10 text-rose-700 dark:bg-rose-500/20 dark:text-rose-300 border-rose-500/20 shadow-xs font-semibold";
-                              } else if (status === "NEEDS_CORRECTION") {
-                                activeClass = "bg-indigo-500/10 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 border-indigo-500/20 shadow-xs font-semibold";
                               }
                             } else {
                               activeClass = "text-muted-foreground hover:text-foreground border-transparent bg-transparent disabled:opacity-40";

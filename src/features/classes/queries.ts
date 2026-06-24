@@ -113,8 +113,7 @@ export async function getClassDetail(classId: string) {
     const incompleteSubmissionsCount = student.checkRecords.filter(
       (r) =>
         r.completionStatus === "INCOMPLETE" ||
-        r.completionStatus === "NOT_DONE" ||
-        r.completionStatus === "NEEDS_CORRECTION",
+        r.completionStatus === "NOT_DONE",
     ).length;
 
     return {

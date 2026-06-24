@@ -54,11 +54,10 @@ export default async function StudentProfilePage({
             : "Inactive student. Historical records are preserved."
         }
       />
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <MetricCard label="Submission rate" value={formatPercent(student.submissionRate)} />
         <MetricCard label="Completion rate" value={formatPercent(student.completionRate)} />
         <MetricCard label="Late count" value={student.lateCount} />
-        <MetricCard label="Correction count" value={student.correctionCount} />
       </section>
 
       <Card className="shadow-none border-border/60 bg-card rounded-2xl overflow-hidden">

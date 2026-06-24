@@ -66,8 +66,7 @@ export default async function TopicDetailPage({
             record.submissionStatus === "NOT_SUBMITTED" ||
             record.submissionStatus === "LATE_SUBMISSION" ||
             record.completionStatus === "NOT_DONE" ||
-            record.completionStatus === "INCOMPLETE" ||
-            record.completionStatus === "NEEDS_CORRECTION",
+            record.completionStatus === "INCOMPLETE",
         ).length;
 
         return {
