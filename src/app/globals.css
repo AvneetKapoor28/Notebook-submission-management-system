@@ -90,7 +90,7 @@
 
 .dark {
   color-scheme: dark;
-  --calendar-filter: invert(0.9);
+  --calendar-filter: none;
   --background: oklch(0.14 0.004 250);
   --foreground: oklch(0.92 0.004 250);
   --card: oklch(0.18 0.005 250);
