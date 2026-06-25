@@ -8,13 +8,17 @@ export default async function AnalyticsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-300">
       <PageHeader
-        breadcrumbs={[{ label: "Analytics" }, { label: "Outcome trends" }]}
+        breadcrumbs={[{ label: "Analytics" }, { label: "Overview" }]}
         emoji="📊"
-        title="Outcome trends"
-        description="View reports of how classes and topics are performing over time."
+        title="Analytics"
+        description="Submission rates, completion quality, and student performance across all your classes."
       />
       <AnalyticsCharts
+        kpis={data.kpis}
         classSeries={data.classSeries}
+        submissionDistribution={data.submissionDistribution}
+        completionDistribution={data.completionDistribution}
+        chapterSeries={data.chapterSeries}
         problematicTopics={data.problematicTopics}
       />
     </div>
