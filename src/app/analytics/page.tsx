@@ -18,7 +18,6 @@ export default async function AnalyticsPage() {
         classSeries={data.classSeries}
         submissionDistribution={data.submissionDistribution}
         completionDistribution={data.completionDistribution}
-        chapterSeries={data.chapterSeries}
         problematicTopics={data.problematicTopics}
       />
     </div>

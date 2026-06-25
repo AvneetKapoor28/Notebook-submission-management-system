@@ -32,7 +32,6 @@ export async function getStudentProfile(studentId: string) {
       id: record.id,
       checkDate: record.notebookCheck.checkDate,
       topic: record.notebookCheck.topic.title,
-      chapter: record.notebookCheck.topic.chapter,
       submissionStatus: record.submissionStatus,
       completionStatus: record.completionStatus,
       remarks: record.remarks,

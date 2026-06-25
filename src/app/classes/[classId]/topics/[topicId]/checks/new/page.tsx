@@ -40,7 +40,7 @@ export default async function NewNotebookCheckPage({
         description={
           setup.topic.notebookCheck
             ? `Last checked on ${formatShortDate(setup.topic.notebookCheck.checkDate)}. Update records and submit when finished.`
-            : `Taught on ${formatShortDate(setup.topic.dateTaught)}. Capture the whole class fast, recover safely if the tab closes, and submit once.`
+            : `Notes given on ${formatShortDate(setup.topic.notesGivenOn)}. Capture the whole class fast, recover safely if the tab closes, and submit once.`
         }
       />
       <Card className="shadow-none border-border/80 bg-card">

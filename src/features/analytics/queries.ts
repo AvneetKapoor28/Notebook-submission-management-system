@@ -91,46 +91,6 @@ export async function getAnalyticsData() {
     };
   });
 
-  // ── Chapter-level breakdown ──────────────────────────────────────────────
-  const chapterMap = new Map<
-    string,
-    { chapter: string; totalRecords: number; submitted: number; issueCount: number }
-  >();
-
-  for (const classItem of classes) {
-    for (const topic of classItem.topics) {
-      const records = topic.notebookCheck ? topic.notebookCheck.studentRecords : [];
-      const key = topic.chapter;
-      const existing = chapterMap.get(key) ?? {
-        chapter: topic.chapter,
-        totalRecords: 0,
-        submitted: 0,
-        issueCount: 0,
-      };
-
-      existing.totalRecords += records.length;
-      existing.submitted += records.filter((r) => r.submissionStatus === "SUBMITTED").length;
-      existing.issueCount += records.filter(
-        (r) =>
-          r.submissionStatus === "NOT_SUBMITTED" ||
-          r.submissionStatus === "LATE_SUBMISSION" ||
-          r.completionStatus === "NOT_DONE" ||
-          r.completionStatus === "INCOMPLETE",
-      ).length;
-
-      chapterMap.set(key, existing);
-    }
-  }
-
-  const chapterSeries = Array.from(chapterMap.values())
-    .map((c) => ({
-      chapter: c.chapter,
-      submissionRate: c.totalRecords ? Math.round((c.submitted / c.totalRecords) * 100) : 0,
-      issueCount: c.issueCount,
-    }))
-    .sort((a, b) => b.issueCount - a.issueCount)
-    .slice(0, 8);
-
   // ── Most problematic topics ──────────────────────────────────────────────
   const topicProblemMap = new Map<
     string,
@@ -167,7 +127,6 @@ export async function getAnalyticsData() {
     classSeries,
     submissionDistribution,
     completionDistribution,
-    chapterSeries,
     problematicTopics,
   };
 }

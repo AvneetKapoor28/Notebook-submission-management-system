@@ -41,12 +41,6 @@ type ClassSeries = {
 
 type DistributionItem = { name: string; value: number; color: string };
 
-type ChapterSeries = {
-  chapter: string;
-  submissionRate: number;
-  issueCount: number;
-};
-
 type ProblematicTopic = {
   name: string;
   issueCount: number;
@@ -82,32 +76,6 @@ function PercentTooltip({
   );
 }
 
-function CountTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: { name: string; value: number; fill: string }[];
-  label?: string;
-}) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="rounded-lg border border-border bg-card px-3 py-2 shadow-lg text-sm">
-      <p className="font-semibold text-foreground mb-1">{label}</p>
-      {payload.map((entry) => (
-        <div key={entry.name} className="flex items-center gap-2">
-          <span
-            className="inline-block size-2 rounded-full"
-            style={{ background: entry.fill }}
-          />
-          <span className="text-muted-foreground">{entry.name}:</span>
-          <span className="font-medium text-foreground">{entry.value}</span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function PieTooltipContent({
   active,
@@ -212,14 +180,12 @@ export function AnalyticsCharts({
   classSeries,
   submissionDistribution,
   completionDistribution,
-  chapterSeries,
   problematicTopics,
 }: {
   kpis: KpiData;
   classSeries: ClassSeries[];
   submissionDistribution: DistributionItem[];
   completionDistribution: DistributionItem[];
-  chapterSeries: ChapterSeries[];
   problematicTopics: ProblematicTopic[];
 }) {
   const hasChecks = kpis.totalChecks > 0;
@@ -404,103 +370,52 @@ export function AnalyticsCharts({
             </Card>
           </div>
 
-          {/* ── Row 3: Chapter issues + Problematic topics ──────────────── */}
-          <div className="grid gap-4 xl:grid-cols-2">
-            {/* Chapter-level issues */}
-            {chapterSeries.length > 0 && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle>Issues by chapter</CardTitle>
-                  <CardDescription>
-                    Chapters ranked by number of student issues
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="h-72">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart
-                      layout="vertical"
-                      data={chapterSeries}
-                      margin={{ top: 4, right: 8, bottom: 4, left: 8 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border)" />
-                      <XAxis
-                        type="number"
-                        tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                        axisLine={false}
-                        tickLine={false}
-                      />
-                      <YAxis
-                        type="category"
-                        dataKey="chapter"
-                        width={90}
-                        tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
-                        axisLine={false}
-                        tickLine={false}
-                        tickFormatter={(v: string) =>
-                          v.length > 14 ? v.slice(0, 13) + "…" : v
-                        }
-                      />
-                      <Tooltip content={<CountTooltip />} cursor={{ fill: "var(--muted)", opacity: 0.4 }} />
-                      <Bar
-                        dataKey="issueCount"
-                        name="Issues"
-                        fill="#f59e0b"
-                        radius={[0, 5, 5, 0]}
-                        maxBarSize={24}
-                      />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Most problematic topics */}
-            {problematicTopics.length > 0 && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle>Struggling topics</CardTitle>
-                  <CardDescription>
-                    Topics with the most student issues
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2.5">
-                    {problematicTopics.map((topic, i) => {
-                      const rate = topic.totalRecords
-                        ? Math.round((topic.issueCount / topic.totalRecords) * 100)
-                        : 0;
-                      const intensity =
-                        rate >= 60 ? "#ef4444" : rate >= 35 ? "#f59e0b" : "#6366f1";
-                      return (
-                        <div key={i} className="group relative">
-                          <div className="flex items-center justify-between gap-2 mb-1">
-                            <div className="min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">
-                                {topic.name}
-                              </p>
-                              <p className="text-xs text-muted-foreground">{topic.className}</p>
-                            </div>
-                            <div className="shrink-0 text-right">
-                              <p className="text-sm font-bold" style={{ color: intensity }}>
-                                {topic.issueCount} issues
-                              </p>
-                              <p className="text-xs text-muted-foreground">{rate}% affected</p>
-                            </div>
+          {/* ── Row 3: Problematic topics ──────────────── */}
+          {problematicTopics.length > 0 && (
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle>Struggling topics</CardTitle>
+                <CardDescription>
+                  Topics with the most student issues
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-x-6 gap-y-4 md:grid-cols-2">
+                  {problematicTopics.map((topic, i) => {
+                    const rate = topic.totalRecords
+                      ? Math.round((topic.issueCount / topic.totalRecords) * 100)
+                      : 0;
+                    const intensity =
+                      rate >= 60 ? "#ef4444" : rate >= 35 ? "#f59e0b" : "#6366f1";
+                    return (
+                      <div key={i} className="group relative border-b border-border/40 last:border-0 pb-3 md:pb-0 md:border-0">
+                        <div className="flex items-center justify-between gap-2 mb-1">
+                          <div className="min-w-0">
+                            <p className="text-sm font-semibold text-foreground truncate">
+                              {topic.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{topic.className}</p>
                           </div>
-                          <div className="h-1.5 rounded-full bg-border overflow-hidden">
-                            <div
-                              className="h-full rounded-full transition-all duration-500"
-                              style={{ width: `${rate}%`, background: intensity }}
-                            />
+                          <div className="shrink-0 text-right">
+                            <p className="text-sm font-bold" style={{ color: intensity }}>
+                              {topic.issueCount} {topic.issueCount === 1 ? "issue" : "issues"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">{rate}% affected</p>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                        <div className="h-1.5 rounded-full bg-border overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{ width: `${rate}%`, background: intensity }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* ── Row 4: Per-class summary table ──────────────────────────── */}
           {classSeries.length > 0 && (

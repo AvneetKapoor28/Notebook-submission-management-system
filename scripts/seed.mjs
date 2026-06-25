@@ -54,30 +54,30 @@ const classConfigs = [
     name: "Grade 6 - A",
     size: 32,
     topics: [
-      ["Chapter 1", "Plant Cell", "2026-06-05"],
-      ["Chapter 1", "Animal Cell", "2026-06-10"],
-      ["Chapter 2", "Nutrition in Plants", "2026-06-15"],
-      ["Chapter 2", "Photosynthesis", "2026-06-20"],
+      ["Plant Cell", "2026-06-05"],
+      ["Animal Cell", "2026-06-10"],
+      ["Nutrition in Plants", "2026-06-15"],
+      ["Photosynthesis", "2026-06-20"],
     ],
   },
   {
     name: "Grade 7 - B",
     size: 36,
     topics: [
-      ["Chapter 3", "Heat Transfer", "2026-06-04"],
-      ["Chapter 3", "Conduction and Convection", "2026-06-09"],
-      ["Chapter 4", "Acids and Bases", "2026-06-14"],
-      ["Chapter 4", "Indicators", "2026-06-19"],
+      ["Heat Transfer", "2026-06-04"],
+      ["Conduction and Convection", "2026-06-09"],
+      ["Acids and Bases", "2026-06-14"],
+      ["Indicators", "2026-06-19"],
     ],
   },
   {
     name: "Grade 8 - A",
     size: 38,
     topics: [
-      ["Chapter 5", "Force and Pressure", "2026-06-03"],
-      ["Chapter 5", "Friction", "2026-06-08"],
-      ["Chapter 6", "Crop Production", "2026-06-13"],
-      ["Chapter 6", "Microorganisms", "2026-06-18"],
+      ["Force and Pressure", "2026-06-03"],
+      ["Friction", "2026-06-08"],
+      ["Crop Production", "2026-06-13"],
+      ["Microorganisms", "2026-06-18"],
     ],
   },
 ];
@@ -142,7 +142,7 @@ function getSubmissionStatus(classIndex, topicIndex, studentIndex, isCorrectionC
   }
 
   if (!isCorrectionCheck && (studentIndex + classIndex) % 19 === 0) {
-    return "EXCUSED";
+    return "SUBMITTED";
   }
 
   return "SUBMITTED";
@@ -162,7 +162,7 @@ function getCompletionStatus(submissionStatus, classIndex, topicIndex, studentIn
   }
 
   if ((studentIndex + classIndex + topicIndex) % 13 === 0) {
-    return "NEEDS_CORRECTION";
+    return "INCOMPLETE";
   }
 
   if ((studentIndex + topicIndex) % 9 === 0) {
@@ -187,10 +187,6 @@ function getRemarkTags(submissionStatus, completionStatus) {
     tags.push("Homework Incomplete");
   }
 
-  if (completionStatus === "NEEDS_CORRECTION") {
-    tags.push("Corrections Pending");
-  }
-
   if (completionStatus === "NOT_DONE") {
     tags.push("Diagram Missing");
   }
@@ -209,10 +205,6 @@ function getRemarks(submissionStatus, completionStatus, rollNumber) {
 
   if (submissionStatus === "NOT_SUBMITTED") {
     return `Follow-up needed with roll ${rollNumber}`;
-  }
-
-  if (completionStatus === "NEEDS_CORRECTION") {
-    return "Recheck diagrams and written explanation";
   }
 
   return null;
@@ -261,16 +253,16 @@ async function seed() {
       }
 
       for (const [topicIndex, topicTuple] of classConfig.topics.entries()) {
-        const [chapter, title, dateTaught] = topicTuple;
+        const [title, notesGivenOn] = topicTuple;
         const topicId = randomUUID();
 
         await tx`
-          insert into topics (id, class_id, chapter, title, date_taught)
-          values (${topicId}, ${classId}, ${chapter}, ${title}, ${dateTaught})
+          insert into topics (id, class_id, title, notes_given_on)
+          values (${topicId}, ${classId}, ${title}, ${notesGivenOn})
         `;
 
         const regularCheckId = randomUUID();
-        const regularCheckDate = addDays(dateTaught, 3);
+        const regularCheckDate = addDays(notesGivenOn, 3);
 
         await tx`
           insert into notebook_checks (id, topic_id, check_date)

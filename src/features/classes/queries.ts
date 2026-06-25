@@ -74,7 +74,7 @@ export async function getClassDetail(classId: string) {
         },
       },
       topics: {
-        orderBy: (table, { desc: orderDesc }) => [orderDesc(table.dateTaught)],
+        orderBy: (table, { desc: orderDesc }) => [orderDesc(table.notesGivenOn)],
         with: {
           notebookCheck: {
             with: {

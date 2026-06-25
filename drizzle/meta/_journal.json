@@ -43,6 +43,20 @@
       "when": 1782387235654,
       "tag": "0005_nosy_bulldozer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782393405306,
+      "tag": "0006_thick_dracula",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1782393430188,
+      "tag": "0007_lush_blue_blade",
+      "breakpoints": true
     }
   ]
 }

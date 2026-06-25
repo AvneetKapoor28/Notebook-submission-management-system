@@ -89,7 +89,7 @@ export default async function TopicDetailPage({
         ]}
         emoji="📓"
         title={topic.title}
-        description={`Chapter ${topic.chapter} • Taught on ${formatShortDate(topic.dateTaught)}`}
+        description={`Notes Given on ${formatShortDate(topic.notesGivenOn)}`}
         actions={
           <Button asChild size="sm">
             <Link href={`/classes/${classId}/topics/${topicId}/checks/new`}>

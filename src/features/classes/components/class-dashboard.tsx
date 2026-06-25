@@ -23,9 +23,8 @@ import { cn } from "@/lib/utils";
 
 type TopicItem = {
   id: string;
-  chapter: string;
   title: string;
-  dateTaught: string;
+  notesGivenOn: string;
   lastCheckDate: string | null;
   completionRate: number | null;
   checkCount: number;
@@ -62,8 +61,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
     const query = topicSearchQuery.toLowerCase();
     return classItem.topics.filter(
       (topic) =>
-        topic.title.toLowerCase().includes(query) ||
-        (topic.chapter && topic.chapter.toLowerCase().includes(query))
+        topic.title.toLowerCase().includes(query)
     );
   }, [classItem.topics, topicSearchQuery]);
 
@@ -122,7 +120,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search topic or chapter..."
+                  placeholder="Search topic..."
                   value={topicSearchQuery}
                   onChange={(e) => setTopicSearchQuery(e.target.value)}
                   className="pl-8 pr-8 h-8 text-xs shadow-none w-full bg-white/85 dark:bg-card/75"
@@ -164,9 +162,6 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
             <div className="p-4 border border-border/60 bg-neutral-50/15 rounded-xl animate-in fade-in slide-in-from-top-3 duration-200">
               <TopicForm
                 classId={classItem.id}
-                existingChapters={Array.from(
-                  new Set(classItem.topics.map((t) => t.chapter).filter(Boolean))
-                )}
               />
             </div>
           )}
@@ -178,8 +173,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                 <TableHeader className="sticky top-0 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-xs z-10 border-b border-border/80 shadow-[0_1px_0_0_rgba(0,0,0,0.03)]">
                   <TableRow className="hover:bg-transparent">
                     <TableHead className="py-2.5 text-xs font-semibold">Topic</TableHead>
-                    <TableHead className="py-2.5 text-xs font-semibold">Chapter</TableHead>
-                    <TableHead className="py-2.5 text-xs font-semibold">Date taught</TableHead>
+                    <TableHead className="py-2.5 text-xs font-semibold">Notes Given on</TableHead>
                     <TableHead className="py-2.5 text-xs font-semibold">Last checked</TableHead>
                     <TableHead className="py-2.5 text-xs font-semibold">Completion rate</TableHead>
                     <TableHead className="py-2.5 text-xs font-semibold">Status</TableHead>
@@ -189,7 +183,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                 <TableBody>
                   {filteredTopics.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-12 text-muted-foreground/60 italic text-sm">
+                      <TableCell colSpan={6} className="text-center py-12 text-muted-foreground/60 italic text-sm">
                         {topicSearchQuery.trim()
                           ? `No topics found matching "${topicSearchQuery}".`
                           : 'No topics created yet. Click "+ New Topic" above to get started.'}
@@ -202,10 +196,7 @@ export function ClassDashboard({ classItem }: { classItem: ClassItem }) {
                           {topic.title}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground py-3.5">
-                          {topic.chapter}
-                        </TableCell>
-                        <TableCell className="text-xs text-muted-foreground py-3.5">
-                          {formatShortDate(topic.dateTaught)}
+                          {formatShortDate(topic.notesGivenOn)}
                         </TableCell>
                         <TableCell className="text-xs text-muted-foreground py-3.5">
                           {formatShortDate(topic.lastCheckDate)}

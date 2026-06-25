@@ -17,14 +17,11 @@ import {
   topicFormSchema,
   type TopicFormValues,
 } from "@/features/topics/schemas";
-import { ChapterSelect } from "./chapter-select";
 
 export function TopicForm({
   classId,
-  existingChapters = [],
 }: {
   classId: string;
-  existingChapters?: string[];
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -32,24 +29,15 @@ export function TopicForm({
     register,
     handleSubmit,
     reset,
-    setValue,
-    watch,
     formState: { errors },
   } = useForm<TopicFormValues>({
     resolver: zodResolver(topicFormSchema),
     defaultValues: {
       classId,
-      chapter: "",
       title: "",
-      dateTaught: new Date().toISOString().slice(0, 10),
+      notesGivenOn: new Date().toISOString().slice(0, 10),
     },
   });
-
-  const chapterValue = watch("chapter");
-
-  React.useEffect(() => {
-    register("chapter");
-  }, [register]);
 
   const onSubmit = handleSubmit((values) => {
     startTransition(async () => {
@@ -63,9 +51,8 @@ export function TopicForm({
       toast.success(result.message);
       reset({
         classId,
-        chapter: "",
         title: "",
-        dateTaught: new Date().toISOString().slice(0, 10),
+        notesGivenOn: new Date().toISOString().slice(0, 10),
       });
       router.refresh();
     });
@@ -74,24 +61,9 @@ export function TopicForm({
   return (
     <form className="grid gap-4 sm:grid-cols-12" onSubmit={onSubmit}>
       <input type="hidden" value={classId} {...register("classId")} />
-      
-      {/* Chapter (Dropdown / Combobox) */}
-      <div className="space-y-1.5 sm:col-span-3">
-        <Label htmlFor="topic-chapter" className="text-xs font-semibold text-muted-foreground/90">
-          Chapter
-        </Label>
-        <ChapterSelect
-          id="topic-chapter"
-          existingChapters={existingChapters}
-          value={chapterValue}
-          onChange={(val) => setValue("chapter", val, { shouldValidate: true })}
-          placeholder="Select or type chapter..."
-        />
-        <FormMessage message={errors.chapter?.message} />
-      </div>
 
       {/* Topic Title */}
-      <div className="space-y-1.5 sm:col-span-4">
+      <div className="space-y-1.5 sm:col-span-7">
         <Label htmlFor="topic-title" className="text-xs font-semibold text-muted-foreground/90">
           Topic Title / Lesson Name
         </Label>
@@ -107,21 +79,21 @@ export function TopicForm({
         <FormMessage message={errors.title?.message} />
       </div>
 
-      {/* Date Taught */}
+      {/* Notes Given on */}
       <div className="space-y-1.5 sm:col-span-3">
-        <Label htmlFor="date-taught" className="text-xs font-semibold text-muted-foreground/90">
-          Date Taught
+        <Label htmlFor="notes-given-on" className="text-xs font-semibold text-muted-foreground/90">
+          Notes Given on
         </Label>
         <div className="relative">
           <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/50 pointer-events-none" />
           <Input
-            id="date-taught"
+            id="notes-given-on"
             type="date"
             className="pl-9 h-10 shadow-sm border-border/80 focus:border-primary/50 w-full"
-            {...register("dateTaught")}
+            {...register("notesGivenOn")}
           />
         </div>
-        <FormMessage message={errors.dateTaught?.message} />
+        <FormMessage message={errors.notesGivenOn?.message} />
       </div>
 
       {/* Submit Button */}

@@ -93,19 +93,18 @@ export const topics = pgTable(
     classId: uuid("class_id")
       .notNull()
       .references(() => classes.id, { onDelete: "cascade" }),
-    chapter: text("chapter").notNull(),
     title: text("title").notNull(),
-    dateTaught: date("date_taught").notNull(),
+    notesGivenOn: date("notes_given_on").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
   },
   (table) => [
-    index("topics_class_date_idx").on(table.classId, table.dateTaught),
+    index("topics_class_date_idx").on(table.classId, table.notesGivenOn),
     uniqueIndex("topics_class_title_date_idx").on(
       table.classId,
       table.title,
-      table.dateTaught,
+      table.notesGivenOn,
     ),
   ],
 );

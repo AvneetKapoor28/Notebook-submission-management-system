@@ -88,7 +88,6 @@ export default async function StudentProfilePage({
                     <TableCell>
                       <div>
                         <p className="font-medium text-sm text-foreground">{record.topic}</p>
-                        <p className="text-[10px] text-muted-foreground/70 mt-0.5">{record.chapter}</p>
                       </div>
                     </TableCell>
 
