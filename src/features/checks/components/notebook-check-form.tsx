@@ -554,24 +554,6 @@ export function NotebookCheckForm({
                             );
                           })()}
                           
-                          {/* Tags/Remarks Summary (only visible when collapsed) */}
-                          {!isExpanded && ((row?.remarkTags && row.remarkTags.length > 0) || row?.remarks) ? (
-                            <div className="flex flex-wrap gap-1 max-w-[150px] mt-1.5 animate-in fade-in duration-200">
-                              {row.remarkTags?.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400 border border-neutral-200/40 dark:border-neutral-800/40"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                              {row.remarks && (
-                                <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-[9px] font-medium bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-200/20 dark:border-amber-905/20 max-w-[100px] truncate">
-                                  {row.remarks}
-                                </span>
-                              )}
-                            </div>
-                          ) : null}
                         </div>
                       </td>
                     </tr>
