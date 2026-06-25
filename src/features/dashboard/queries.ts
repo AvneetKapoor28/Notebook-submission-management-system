@@ -73,6 +73,36 @@ export async function getDashboardData() {
     .sort((left, right) => right.lateCount - left.lateCount)
     .slice(0, 5);
 
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayDate = new Date(todayStr + "T00:00:00Z");
+
+  const overduePendingChecks = classes.flatMap((classItem) =>
+    classItem.topics
+      .filter((topic) => {
+        if (topic.notebookCheck) return false;
+
+        const givenDate = new Date(topic.notesGivenOn + "T00:00:00Z");
+        const diffTime = todayDate.getTime() - givenDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return diffDays > 3;
+      })
+      .map((topic) => {
+        const givenDate = new Date(topic.notesGivenOn + "T00:00:00Z");
+        const diffTime = todayDate.getTime() - givenDate.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        return {
+          topicId: topic.id,
+          topicTitle: topic.title,
+          classId: classItem.id,
+          className: classItem.name,
+          notesGivenOn: topic.notesGivenOn,
+          daysPast: diffDays,
+        };
+      })
+  ).sort((left, right) => right.daysPast - left.daysPast);
+
   return {
     teacherName: teacher.name,
     totalClasses: classes.length,
@@ -84,5 +114,6 @@ export async function getDashboardData() {
       total: defaulters.length,
       missing: defaulters.filter((student) => student.missingCount > 0).length,
     },
+    overduePendingChecks,
   };
 }

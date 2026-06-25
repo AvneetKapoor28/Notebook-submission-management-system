@@ -16,6 +16,7 @@ import { MetricCard } from "@/components/app/metric-card";
 import { getDashboardData } from "@/features/dashboard/queries";
 import { listClassesOverview } from "@/features/classes/queries";
 import { formatShortDate } from "@/lib/format";
+import { OverdueChecksWidget } from "@/features/dashboard/components/overdue-checks-widget";
 
 export default async function DashboardPage() {
   const data = await getDashboardData();
@@ -61,6 +62,8 @@ export default async function DashboardPage() {
           </Button>
         }
       />
+
+      <OverdueChecksWidget items={data.overduePendingChecks} />
 
       {/* Stats Summary Section */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
