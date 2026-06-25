@@ -3,10 +3,10 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 
 export async function getNotebookCheckSetup(topicId: string) {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const topic = await db.query.topics.findFirst({
     where: eq(schema.topics.id, topicId),
     with: {
@@ -37,7 +37,7 @@ export async function getNotebookCheckSetup(topicId: string) {
 }
 
 export async function getNotebookCheckDetail(checkId: string) {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const check = await db.query.notebookChecks.findFirst({
     where: eq(schema.notebookChecks.id, checkId),
     with: {

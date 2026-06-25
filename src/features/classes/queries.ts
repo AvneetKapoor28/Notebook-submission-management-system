@@ -3,7 +3,7 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 
 function calculateCompletionRate(
   records: Array<{ completionStatus: string | null }>,
@@ -22,7 +22,7 @@ function calculateCompletionRate(
 }
 
 export async function listClassesOverview() {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const classes = await db.query.classes.findMany({
     where: eq(schema.classes.teacherId, teacher.id),
     orderBy: (table, { asc }) => [asc(table.name)],
@@ -60,7 +60,7 @@ export async function listClassesOverview() {
 }
 
 export async function getClassDetail(classId: string) {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const classItem = await db.query.classes.findFirst({
     where: and(
       eq(schema.classes.id, classId),

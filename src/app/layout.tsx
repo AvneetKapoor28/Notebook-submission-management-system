@@ -5,6 +5,7 @@ import { AppShell } from "@/components/app/app-shell";
 import { ClientProviders } from "@/components/app/client-providers";
 import { APP_NAME } from "@/lib/constants";
 import { listClassesOverview } from "@/features/classes/queries";
+import { getCurrentTeacher } from "@/lib/current-teacher";
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -18,7 +19,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const classes = await listClassesOverview().catch(() => []);
+  const [classes, teacher] = await Promise.all([
+    listClassesOverview().catch(() => []),
+    getCurrentTeacher().catch(() => null),
+  ]);
 
   return (
     <html lang="en" className="h-full antialiased" suppressHydrationWarning>
@@ -38,7 +42,9 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <AppShell classes={classes}>{children}</AppShell>
+        <AppShell classes={classes} teacher={teacher}>
+          {children}
+        </AppShell>
         <ClientProviders />
       </body>
     </html>

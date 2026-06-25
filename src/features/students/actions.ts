@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq, inArray } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 import {
   failureResult,
   fromValidationError,
@@ -26,7 +26,7 @@ export async function createStudentAction(values: StudentFormValues) {
     return fromValidationError(parsed.error);
   }
 
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const ownedClass = await db.query.classes.findFirst({
     where: and(
       eq(schema.classes.id, parsed.data.classId),
@@ -54,7 +54,7 @@ export async function importStudentsAction(values: StudentImportValues) {
     return fromValidationError(parsed.error);
   }
 
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const ownedClass = await db.query.classes.findFirst({
     where: and(
       eq(schema.classes.id, parsed.data.classId),
@@ -119,7 +119,7 @@ export async function updateStudentActiveStateAction(values: {
     return fromValidationError(parsed.error);
   }
 
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const student = await db.query.students.findFirst({
     where: eq(schema.students.id, parsed.data.studentId),
     with: {

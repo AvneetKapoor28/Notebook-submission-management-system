@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 import {
   failureResult,
   fromValidationError,
@@ -23,7 +23,7 @@ export async function createNotebookCheckAction(values: NotebookCheckFormValues)
     return fromValidationError(parsed.error);
   }
 
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const topic = await db.query.topics.findFirst({
     where: eq(schema.topics.id, parsed.data.topicId),
     with: {

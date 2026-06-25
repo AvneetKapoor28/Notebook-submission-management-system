@@ -3,10 +3,10 @@ import "server-only";
 import { and, eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 
 export async function getStudentProfile(studentId: string) {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const student = await db.query.students.findFirst({
     where: eq(schema.students.id, studentId),
     with: {
@@ -66,7 +66,7 @@ export async function getStudentProfile(studentId: string) {
 }
 
 export async function listStudentsForClass(classId: string) {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
 
   return db.query.students.findMany({
     where: and(

@@ -3,10 +3,10 @@ import "server-only";
 import { eq } from "drizzle-orm";
 
 import { db, schema } from "@/db";
-import { getCurrentTeacher } from "@/lib/current-teacher";
+import { requireCurrentTeacher } from "@/lib/current-teacher";
 
 export async function getAnalyticsData() {
-  const teacher = await getCurrentTeacher();
+  const teacher = await requireCurrentTeacher();
   const classes = await db.query.classes.findMany({
     where: eq(schema.classes.teacherId, teacher.id),
     with: {

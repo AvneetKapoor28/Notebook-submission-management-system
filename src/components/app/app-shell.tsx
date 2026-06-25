@@ -11,11 +11,14 @@ import {
   Menu,
   X,
   ChevronRight,
+  LogOut,
+  User,
 } from "lucide-react";
 
 import { APP_NAME } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
+import { logoutAction } from "@/features/auth/logout";
 
 type ClassItem = {
   id: string;
@@ -24,6 +27,12 @@ type ClassItem = {
   activeStudentCount: number;
   topicCount: number;
   latestCheckDate: string | null;
+};
+
+type Teacher = {
+  id: string;
+  name: string;
+  email: string;
 };
 
 const navItems = [
@@ -36,12 +45,20 @@ const navItems = [
 export function AppShell({
   children,
   classes = [],
+  teacher,
 }: {
   children: React.ReactNode;
   classes?: ClassItem[];
+  teacher?: Teacher | null;
 }) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Auth pages: render children without the shell
+  const AUTH_PATHS = ["/login", "/register"];
+  if (AUTH_PATHS.some((p) => pathname.startsWith(p))) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="flex min-h-screen bg-background text-foreground animate-in fade-in duration-200">
@@ -163,10 +180,31 @@ export function AppShell({
         {/* Sidebar Footer */}
         <div className="mt-auto border-t border-sidebar-border pt-4 px-3 flex flex-col gap-3">
           <ThemeToggle />
-          <div className="text-[10px] text-muted-foreground flex items-center gap-1.5">
-            <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Active Session</span>
-          </div>
+
+          {/* Teacher info + logout */}
+          {teacher && (
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center justify-center size-6 rounded-full bg-sidebar-accent shrink-0">
+                  <User className="size-3 text-muted-foreground" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-foreground truncate leading-tight">{teacher.name}</p>
+                  <p className="text-[10px] text-muted-foreground truncate leading-tight">{teacher.email}</p>
+                </div>
+              </div>
+              <form action={logoutAction}>
+                <button
+                  type="submit"
+                  title="Sign out"
+                  aria-label="Sign out"
+                  className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded hover:bg-sidebar-accent/60 shrink-0"
+                >
+                  <LogOut className="size-3.5" />
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </aside>
 
