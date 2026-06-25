@@ -4,12 +4,12 @@ import {
   BookOpen, 
   Users, 
   Plus, 
-  Sparkles, 
   ChevronRight, 
   ArrowRight, 
   TrendingUp
 } from "lucide-react";
 
+import { PageHeader } from "@/components/app/page-header";
 import { EmptyState } from "@/components/app/empty-state";
 import { Button } from "@/components/ui/button";
 import { MetricCard } from "@/components/app/metric-card";
@@ -47,36 +47,20 @@ export default async function DashboardPage() {
     : null;
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-300">
-      {/* Welcome Banner Card */}
-      <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-r from-neutral-500/5 via-neutral-500/[0.02] to-transparent dark:from-neutral-100/5 dark:via-neutral-100/[0.02] dark:to-transparent p-6 md:p-8">
-        {/* Decorative ambient background glows */}
-        <div className="absolute -top-24 -right-24 h-48 w-48 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
-
-        <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-              <Sparkles className="size-3.5 animate-pulse" />
-              <span>Teacher Workspace Home</span>
-            </div>
-            <h1 className="font-heading text-3xl md:text-4xl font-bold tracking-tight text-foreground">
-              Welcome back, {data.teacherName} 👋
-            </h1>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Manage your classrooms, record checks, and monitor student defaulters all from one central workspace hub.
-            </p>
-          </div>
-          <div className="shrink-0 flex flex-wrap gap-3">
-            <Button asChild className="shadow-xs cursor-pointer">
-              <Link href="/classes" className="flex items-center gap-2">
-                <Plus className="size-4" />
-                <span>Start a Check</span>
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6 animate-in fade-in duration-300">
+      <PageHeader
+        emoji="👋"
+        title={`Welcome back, ${data.teacherName}`}
+        description="Manage your classrooms, record checks, and monitor student defaulters all from one central workspace hub."
+        actions={
+          <Button asChild className="shadow-xs cursor-pointer">
+            <Link href="/classes" className="flex items-center gap-2">
+              <Plus className="size-4" />
+              <span>Start a Check</span>
+            </Link>
+          </Button>
+        }
+      />
 
       {/* Stats Summary Section */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
